@@ -1,4 +1,4 @@
-package sample;
+package geometry;
 
 import javafx.scene.shape.Circle;
 

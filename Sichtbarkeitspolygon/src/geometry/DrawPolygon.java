@@ -1,11 +1,9 @@
-package sample;
+package geometry;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.effect.Light;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -49,8 +47,8 @@ public class DrawPolygon extends Application {
                 point.setCenterY(mouseEvent.getSceneY());
                 point.setRadius(6.5);
                 CList.add(point);
+                //add to Point Scene
                 pointscene.getChildren().add(point);
-
 
             }
         });

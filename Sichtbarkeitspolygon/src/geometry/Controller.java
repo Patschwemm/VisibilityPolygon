@@ -1,4 +1,4 @@
-package sample;
+package geometry;
 
 public class Controller {
 }
