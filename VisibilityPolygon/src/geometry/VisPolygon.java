@@ -1,4 +1,349 @@
 package geometry;
 
-public class VisPolygon {
+import com.sun.javafx.scene.traversal.Algorithm;
+import javafx.scene.Group;
+import javafx.scene.PointLight;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import org.w3c.dom.css.RGBColor;
+
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+
+public class VisPolygon extends Polygon {
+
+    // List for iteration through points for algorithm
+    private ArrayList<Circle> PointList = (ArrayList<Circle>) GUI.polygon.getPointList().clone();
+    // List with Elements that belong to visibility polygon
+    private ArrayList<Circle> VisPointList = new ArrayList<>(PointList.size());
+    private ArrayList<Line> VisEdgeList = new ArrayList<>(PointList.size());
+    private int p_idx;
+    private int s_idx;
+    //invert valid visible angle from Point p
+    private boolean invert_angle = false;
+
+
+    public VisPolygon() {
+        super();
+
+        //check if Polygon is given and p point for visibility is given
+        if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_p_set()) {
+
+            // preprocessing
+            // ----------------------------------------
+            GUI.polygon.setPointList(pre_Processing_Points(PointList));
+            pre_Processing_P(PointList, GUI.polygon.get_p());
+
+            // calculate visibility
+            // ----------------------------------------
+
+            Algorithm_default(PointList, GUI.polygon.get_p());
+
+        } else {
+            System.out.println("Input of Polygon and visibility Point p neede");
+            Settings.get().get_vis_p_Status().setSelected(false);
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Algorithm
+    // ----------------------------------------------------------------------------------------------------------------
+
+    private void Algorithm_default(ArrayList<Circle> List, Circle p) {
+
+        // calculate visible starting point (done in Pre-Processing)
+        // ArrayList with visible point of polygon edge
+        // Start Point s_idx
+        // Edge Point p_idx
+        // invert_angle = false for initial angle orientation
+
+        int start = decrementIdx(s_idx);
+
+        while (s_idx != start){
+            System.out.println("in Loop");
+            System.out.println("start: "+ start+ " s_idx: "+s_idx +" p_idx: "+p_idx);
+            EdgeCycle(List,p);
+
+        }
+
+        connectEdges(VisPointList);
+        addToScene(GUI.polygonscene, VisEdgeList);
+        System.out.println("End. \n VisEdgeListe.size():" + VisEdgeList.size() + " VispointList.size()"+ VisPointList.size());
+    }
+
+    private void EdgeCycle(ArrayList<Circle> List, Circle p){
+        //if angle is correct add to vispoints
+        System.out.println("List size "+ List.size()+" s_idx: "+ s_idx+ " p_idx"+ p_idx +"before \n");
+        s_idx = incrementIdx(s_idx);
+        p_idx = incrementIdx(p_idx);
+
+        //if signe is true means positive for the angle requirement (inverted or not) so visible
+        System.out.println("List size "+ List.size()+" s_idx: "+ s_idx+ " p_idx"+ p_idx + "after \n");
+        if (visibleAngle(List.get(s_idx),p,List.get(p_idx)) == true) {
+            VisPointList.add(List.get(p_idx));
+        } else {
+        // delete points that are hidden by this non visible edge
+
+        }
+
+    }
+
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Pre-Processing
+    // ----------------------------------------------------------------------------------------------------------------
+
+
+    // Sort Array Clockwise or Counterclockwise
+    private ArrayList<Circle> pre_Processing_Points(ArrayList<Circle> PointList) {
+
+        //test Orientation of the given Polygon
+        if (testOrientation(PointList) == "clockwise") {
+            System.out.println("Clockwise input of Poygon, rearranging Pointlist");
+            PointList = rearrangeCounterClockwise(PointList);
+        } else {
+
+            System.out.println("Counterclockwise Input of Polygon");
+        }
+
+        return PointList;
+    }
+
+    //find idx for Point that is a valid node of visibility Polygon
+    private void pre_Processing_P(ArrayList<Circle> PointList, Circle p) {
+
+        if (p == null) {
+            System.out.println("p is null");
+        }
+
+        //find point with smallest distance
+        double smallest_dist = 10000;
+        int idx = 0;
+        for (int i = 0; i < PointList.size(); i++) {
+
+            //check and save idx
+            if (smallest_dist >= inRange(p, PointList.get(i))) {
+                smallest_dist = inRange(p, PointList.get(i));
+                idx = i;
+            }
+        }
+
+        //three cases, idx is 0 so connecting node is at end of List, or idx is at end so connectin node is at beginning
+        // check both adjacent nodes one must be visible ( with positive angle)
+        if (idx == PointList.size() - 1) {
+            if (checkAngle(PointList.get(idx - 1), p, PointList.get(idx)) > 0) {
+                VisPointList.add(PointList.get(idx - 1));
+                VisPointList.add(PointList.get(idx));
+                s_idx = idx-1;
+                p_idx = idx;
+            } else {
+                VisPointList.add(PointList.get(idx));
+                VisPointList.add(PointList.get(0));
+                s_idx = idx;
+                p_idx = 0;
+            }
+        } else if (idx == 0) {
+            if (checkAngle(PointList.get(PointList.size() - 1), p, PointList.get(idx)) > 0) {
+                VisPointList.add(PointList.get(PointList.size() - 1));
+                VisPointList.add(PointList.get(idx));
+                s_idx = PointList.size() - 1;
+                p_idx = idx;
+            } else {
+                VisPointList.add(PointList.get(idx));
+                VisPointList.add(PointList.get(idx + 1));
+                s_idx = idx;
+                p_idx = idx +1 ;
+            }
+        } else {
+            if (checkAngle(PointList.get(idx - 1), p, PointList.get(idx)) > 0) {
+                VisPointList.add(PointList.get(idx - 1));
+                VisPointList.add(PointList.get(idx));
+                s_idx = idx-1;
+                p_idx = idx;
+            } else {
+                VisPointList.add(PointList.get(idx));
+                VisPointList.add(PointList.get(idx + 1));
+                s_idx = idx;
+                p_idx = idx+1 ;
+            }
+        }
+    }
+
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Geometry Helpers
+    // ----------------------------------------------------------------------------------------------------------------
+
+    private boolean visibleAngle ( Circle v1, Circle p, Circle v2){
+        if (checkAngle(v1,p,v2) > 0){
+            if (invert_angle != true){
+                return true;                    // angle not inverted and >0
+            } else {
+                return false;                   //angle inverted and >0
+            }
+        } else  if (invert_angle != true){
+            return false;                       //angle not inverted and <0
+        } else {
+            return true;                        //angle inverted and <0
+        }
+    }
+
+    // v1 first node, v2 second node, p point of visibility
+    private double checkAngle(Circle v1, Circle p, Circle v2) {
+
+        double angle = 0;
+        double x1 = v1.getCenterX() - p.getCenterX();
+        double y1 = v1.getCenterY() - p.getCenterY();
+        double x2 = v2.getCenterX() - p.getCenterX();
+        double y2 = v2.getCenterY() - p.getCenterY();
+
+
+        angle = Math.atan2(x2 * y1 - y2 * x1, x2 * x1 + y2 * y1) * 180 / Math.PI;
+
+
+        return angle;
+    }
+
+
+    private String testOrientation(ArrayList<Circle> PointList) {
+
+        //fast practical check: get smallest X-Coordinate ( if two are the same smallest y Coord)
+        //check Orientation from three points with fast determinant calculation
+
+        //get smallest X-Coord
+        int idx = 0;
+
+        for (int i = 1; i < PointList.size(); i++) {
+            if (PointList.get(idx).getCenterX() > PointList.get(i).getCenterX()) {
+                idx = i;
+            }
+            if (PointList.get(idx).getCenterX() == PointList.get(i).getCenterX() &&
+                    PointList.get(idx).getCenterY() > PointList.get(i).getCenterY()) {
+                idx = i;
+            }
+        }
+
+
+        //idx is given and two adjacent points
+        int idx_prev;
+        int idx_next;
+
+        if (idx == 0) {
+            idx_prev = PointList.size() - 1;
+            idx_next = idx + 1;
+        } else if (idx == PointList.size() - 1) {
+            idx_prev = idx - 1;
+            idx_next = 0;
+        } else {
+            idx_prev = idx - 1;
+            idx_next = idx + 1;
+        }
+
+        // A = prev || B = idx || C = next
+        //det(o)=( x_idx - x_prev ) * (y_next - y_prev ) - ( x_next - x_prev ) * ( y_idx - y_prev)
+        double det_orient;
+        det_orient = (PointList.get(idx).getCenterX() - PointList.get(idx_prev).getCenterX())
+                * (PointList.get(idx_next).getCenterY() - PointList.get(idx_prev).getCenterY())
+                - (PointList.get(idx_next).getCenterX() - PointList.get(idx_prev).getCenterX())
+                * (PointList.get(idx).getCenterY() - PointList.get(idx_prev).getCenterY());
+
+
+        //if det(o) is positive then clockwise,negative counterclockwise, 0 if points are collinear
+        if (det_orient > 0) {
+            return "clockwise";
+        } else {
+            return "counterclockwise";
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // List, Point, idx handling
+    // ----------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public Line createEdge(double x1, double y1, double x2, double y2) {
+        Line edge = new Line((float) x1, (float) y1, (float) x2, (float) y2);
+        edge.setStrokeWidth(2);
+        edge.setStroke(Color.RED);
+        return edge;
+    }
+
+    private int incrementIdx(int idx) {
+        if (idx +1 >= PointList.size() ) {
+            idx = 0;
+            return idx;
+        } else {
+            return ++idx;
+        }
+    }
+
+    private int decrementIdx(int idx) {
+        if (idx > 0) {
+            return --idx;
+        } else {
+            idx = PointList.size() - 1;
+            return idx;
+        }
+    }
+
+    public void deleteVisPolygon() {
+        VisPointList.clear();
+    }
+
+    public ArrayList<Circle> rearrangeCounterClockwise(ArrayList<Circle> List) {
+        ArrayList<Circle> PointListInvers = new ArrayList<>(List.size());
+
+        for (int i = List.size() - 1; i >= 0; i--) {
+            PointListInvers.add(List.get(i));
+        }
+        return PointListInvers;
+    }
+
+    private void setAlgorithmS_Idx(int idx) {
+        this.s_idx = idx;
+    }
+
+    private void getAlgorithmS_Idx(int idx) {
+        this.s_idx = idx;
+    }
+
+    private void connectEdges(ArrayList<Circle> List){
+        double[] x = new double[List.size()];
+        double[] y = new double[List.size()];
+
+        javafx.scene.shape.Polygon vis_polygon = new javafx.scene.shape.Polygon();
+
+        for (int i = 0; i< List.size()-1;i++) {
+           vis_polygon.getPoints().addAll(List.get(i).getCenterX(),y[i]= List.get(i).getCenterY());
+        }
+
+        vis_polygon.setStroke(Color.DARKRED);
+        vis_polygon.setStrokeWidth(4);
+
+        vis_polygon.setFill(Color.RED);
+        vis_polygon.setOpacity(0.4);
+
+        GUI.polygonscene.getChildren().add(vis_polygon);
+
+
+
+
+
+//        for (int i = 0; i< List.size()-1;i++){
+//            VisEdgeList.add(createEdge(List.get(i).getCenterX(),List.get(i).getCenterY(),
+//                    List.get(i+1).getCenterX(),List.get(i+1).getCenterY()));
+//        }
+//        VisEdgeList.add(createEdge(List.get(List.size()-1).getCenterX(),List.get(List.size()-1).getCenterY(),
+//                List.get(0).getCenterX(),List.get(0).getCenterY()));
+
+    }
+
+    private void addToScene(Group scene, ArrayList<Line> e){
+        for (int i=0; i< e.size(); i++){
+            scene.getChildren().add(e.get(i));
+        }
+    }
 }
+

@@ -13,10 +13,13 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class GUI extends Application {
 
+    //global Variables
     public static Polygon polygon = new Polygon();
+    public static VisPolygon vis_p;
     public static Stage primary;
     public static Group pointscene = new Group();
     public static Group edgescene = new Group();
+    public static Group polygonscene = new Group();
 
 
     public void start(Stage primaryStage) throws Exception {
@@ -33,7 +36,6 @@ public class GUI extends Application {
         BorderPane background = new BorderPane();
 
 
-
         //set scene to root
         primaryStage.setTitle("Visibility Polygon Applet");
         Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
@@ -48,24 +50,23 @@ public class GUI extends Application {
         foreground.setRight(settings_background);
 
 
-
         //create settings
         Node settings = Settings.get().createSettings();
         settings.toFront();
         settinglayer.setRight(settings);
 
 
-
         //on click insert nodes of polygon
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler());
-
-
 
         //add points to panel layer
         foreground.getChildren().add(this.pointscene);
         this.pointscene.toBack();
         foreground.getChildren().add(this.edgescene);
         this.edgescene.toBack();
+        settinglayer.getChildren().add(this.polygonscene);
+        this.polygonscene.toFront();
+
 
 
         //add all layers to the scene

@@ -1,14 +1,23 @@
 package geometry;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class Settings {
+
+
+    private CheckBox vis_p_status = new CheckBox();
 
     // ================================================================================================
     // gridpane
@@ -18,7 +27,6 @@ public class Settings {
 
     //propertiers
     private int toolbarWidth = 315;
-
 
 
     // instance handling
@@ -31,8 +39,6 @@ public class Settings {
     public static Settings get() {
         return settings;
     }
-
-
 
 
     public Node createSettings() {
@@ -62,41 +68,62 @@ public class Settings {
         addSeparator("Point Options");
 
         Button drawpoly = new Button("Connect");
-        Font font = Font.font("Arial", FontWeight.BOLD,11);
+        Font font = Font.font("Arial", FontWeight.BOLD, 11);
         drawpoly.setFont(font);
         drawpoly.setMaxSize(60, 10);
 
 
         Button delnode = new Button("Delete");
         delnode.setFont(font);
+        delnode.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                GUI.polygon.deletePolygon();
+                if(GUI.vis_p!= null) { GUI.vis_p.deleteVisPolygon();}
+                vis_p_status.setSelected(false);
+            }
+        });
         addButton("Point Nodes", delnode);
 
 
-
-
         CheckBox caption = new CheckBox();
-        addCheckBox( "Node Caption", caption);
+        addCheckBox("Node Caption", caption);
+
 
         CheckBox hidenode = new CheckBox();
-        addCheckBox( "Hide Node", hidenode);
+        addCheckBox("Hide Node", hidenode);
 
         // Polygon Options
         // -------------------------------------
-        addSeparator( "Polygon Options");
+        addSeparator("Polygon Options");
 
-        CheckBox vis_r = new CheckBox();
-        addCheckBox( "VisibilityPolygon", vis_r);
 
-        Slider beta = new Slider(0,720,0);
+
+
+        addCheckBox("VisibilityPolygon", vis_p_status);
+        vis_p_status.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (vis_p_status.isSelected()) {
+                    GUI.vis_p = new VisPolygon();
+                } else {
+                    GUI.vis_p = null;
+                    GUI.polygonscene.getChildren().clear();
+                }
+            }
+        });
+
+
+        Slider beta = new Slider(0, 720, 0);
 
         beta.setShowTickLabels(true);
         beta.setShowTickMarks(true);
         beta.setMajorTickUnit(90);
         beta.setMinorTickCount(45);
-        addNumberSlider("Beta-Erweiterung",0, beta );
+        addNumberSlider("Beta-Erweiterung", 0, beta);
 
         CheckBox realtime = new CheckBox();
-        addCheckBox( "Real Time Update", realtime);
+        addCheckBox("Real Time Update", realtime);
 
         return gp;
     }
@@ -104,7 +131,6 @@ public class Settings {
     // ------------------------------------------------------------------------------------------------
     // gui helper methods
     // ------------------------------------------------------------------------------------------------
-
 
 
     private void addSeparator(String text) {
@@ -134,7 +160,7 @@ public class Settings {
         gp.addRow(rowIndex++, new Label(text), box);
     }
 
-    private void addButton(String text, Button button){
+    private void addButton(String text, Button button) {
 
         HBox box = new HBox();
         box.setSpacing(8);
@@ -143,7 +169,7 @@ public class Settings {
         gp.addRow(rowIndex++, new Label(text), box);
     }
 
-    private void addButtons(String text, Button button1, Button button2){
+    private void addButtons(String text, Button button1, Button button2) {
 
 
         HBox box = new HBox();
@@ -153,7 +179,7 @@ public class Settings {
         gp.addRow(rowIndex++, new Label(text), box);
     }
 
-    private void addToggleButton(String text, ToggleButton tbutton){
+    private void addToggleButton(String text, ToggleButton tbutton) {
         Label valueLabel = new Label();
         valueLabel.setPrefWidth(70);
 
@@ -190,9 +216,16 @@ public class Settings {
         return box;
     }
 
+
     // ------------------------------------------------------------------------------------------------
     // Getters and Setters
     // ------------------------------------------------------------------------------------------------
+
+    public CheckBox get_vis_p_Status() {
+        return vis_p_status;
+    }
+
+
 
 
     public final int getSettingsWidth() {

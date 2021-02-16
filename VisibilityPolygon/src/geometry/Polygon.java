@@ -2,6 +2,7 @@ package geometry;
 
 
 import java.awt.geom.Line2D;
+
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -11,16 +12,19 @@ import java.util.Stack;
 
 public class Polygon {
 
-    private Stack<Circle> P = new Stack<Circle>();
+    private Stack<Circle> P = new Stack<>();
     private ArrayList<Circle> PointList = new ArrayList<>(50);
     private ArrayList<Line> EdgeList = new ArrayList<>(50);
+    private Circle p = null;
     private boolean isPolygonDrawn = false;
+    private boolean is_p_set = false;
+
 
     public void addNode(double x, double y) {
 
         Circle point = this.createNode(x, y);
 
-        if (PointList.size() != 0 && this.inRange(PointList.get(0), point)) {
+        if (PointList.size() != 0 && this.inRange(PointList.get(0), point)<= 15 ) {
             if (PointList.size() <= 2) {
                 System.out.println("tried to draw Polygon with 2 or less nodes");
             } else {
@@ -28,7 +32,7 @@ public class Polygon {
                         PointList.get(PointList.size() - 1).getCenterY(),
                         PointList.get(0).getCenterX(),
                         PointList.get(0).getCenterY());
-                if (!checkIntersection(edge, true)) {
+                if (!checkPolygonIntersection(edge, true)) {
                     System.out.println("Edge is invalid");
                 } else {
                     EdgeList.add(edge);
@@ -38,15 +42,15 @@ public class Polygon {
                 }
             }
         } else {
-            if (PointList.size() == 0){
+            if (PointList.size() == 0) {
                 PointList.add(point);
                 GUI.pointscene.getChildren().add(point);
-            }else if (PointList.size() >= 1) {
+            } else if (PointList.size() >= 1) {
                 Line edge = this.createEdge(PointList.get(PointList.size() - 1).getCenterX(),
                         PointList.get(PointList.size() - 1).getCenterY(),
                         point.getCenterX(),
                         point.getCenterY());
-                if (!checkIntersection(edge,false)) {
+                if (!checkPolygonIntersection(edge, false)) {
                     System.out.println("Edge is invalid");
                 } else {
                     PointList.add(point);
@@ -56,8 +60,6 @@ public class Polygon {
                 }
             }
         }
-        System.out.println("Edge Length: " + EdgeList.size());
-        System.out.println("Point Length: " + PointList.size());
     }
 
     public Circle createNode(double x, double y) {
@@ -67,36 +69,33 @@ public class Polygon {
         point.setCenterX(x);
         point.setCenterY(y);
         point.setRadius(5.5);
-        point.setStroke(Color.DARKRED);
-        point.setFill(Color.DARKRED);
+        point.setStroke(Color.BLACK);
+        point.setFill(Color.BLACK);
         return point;
     }
 
     public Line createEdge(double x1, double y1, double x2, double y2) {
         Line edge = new Line((float) x1, (float) y1, (float) x2, (float) y2);
         edge.setStrokeWidth(5);
-        edge.setStroke(Color.DARKRED);
+        edge.setStroke(Color.BLACK);
         return edge;
     }
 
-    public boolean checkIntersection(Line edge, boolean connector) {
+    public boolean checkPolygonIntersection(Line edge, boolean connector) {
 
-        float x1 = (float)edge.getStartX();
-        float y1 = (float)edge.getStartY();
-        float x2 = (float)edge.getEndX();
-        float y2 = (float)edge.getEndY();
+        double x1 = edge.getStartX();
+        double y1 = edge.getStartY();
+        double x2 = edge.getEndX();
+        double y2 = edge.getEndY();
 
-
-
-        for (int i=(connector)? 1 : 0; i < EdgeList.size()-1; i++) {
+        for (int i = (connector) ? 1 : 0; i < EdgeList.size() -1; i++) {
             double x3 = EdgeList.get(i).getStartX();
             double y3 = EdgeList.get(i).getStartY();
             double x4 = EdgeList.get(i).getEndX();
             double y4 = EdgeList.get(i).getEndY();
 
 
-
-            if ( Line2D.linesIntersect(x1,y1,x2,y2,x3,y3,x4,y4)) {
+            if (Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
                 return false;
             }
         }
@@ -104,12 +103,19 @@ public class Polygon {
     }
 
 
-    public boolean inRange(Circle c1, Circle c2) {
-        System.out.println("Euclid distance: " + (Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
-                + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))));
-
+    public double inRange(Circle c1, Circle c2) {
         return ((Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
-                + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))) <= 15);
+                + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))) );
+    }
+
+    public void deletePolygon() {
+        this.EdgeList.clear();
+        this.PointList.clear();
+        GUI.pointscene.getChildren().clear();
+        GUI.edgescene.getChildren().clear();
+        p = null;
+        this.is_p_set = false;
+        this.isPolygonDrawn = false;
     }
 
 
@@ -126,20 +132,29 @@ public class Polygon {
         return this.isPolygonDrawn;
     }
 
+    public boolean is_p_set() {
+        return this.is_p_set;
+    }
+
     public void setPointList(ArrayList<Circle> pointList) {
-        PointList = pointList;
+        this.PointList = pointList;
     }
 
     public ArrayList<Circle> getPointList() {
         return PointList;
     }
 
-    public void setEdgeList(ArrayList<Line> edgeList) {
-        EdgeList = edgeList;
+
+    public Circle get_p() {
+        return this.p;
     }
 
-    public ArrayList<Line> getEdgeList() {
-        return EdgeList;
+    public void set_p(double x, double y) {
+        this.p = createNode(x, y);
+        this.p.setStroke(Color.DARKRED);
+        this.p.setFill(Color.DARKRED);
+        this.is_p_set = true;
+        GUI.pointscene.getChildren().add(p);
     }
 
 }
