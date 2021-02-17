@@ -149,6 +149,11 @@ public class Polygon {
         return this.p;
     }
 
+    public void move_p(double x, double y ){
+        this.p.setCenterX(x);
+        this.p.setCenterY(y);
+    }
+
     public void set_p(double x, double y) {
         this.p = createNode(x, y);
         this.p.setStroke(Color.DARKRED);

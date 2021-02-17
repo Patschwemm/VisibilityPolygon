@@ -58,6 +58,7 @@ public class GUI extends Application {
 
         //on click insert nodes of polygon
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler());
+//        scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler());
 
         //add points to panel layer
         foreground.getChildren().add(this.pointscene);

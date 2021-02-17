@@ -16,9 +16,6 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
             GUI.polygon.addNode(mouseEvent.getSceneX(), mouseEvent.getSceneY());
         }
 
-//        System.out.println(" Click X: "+ mouseEvent.getSceneX() + " Click Y: "+ mouseEvent.getSceneY());
-
-
     }
 }
 
