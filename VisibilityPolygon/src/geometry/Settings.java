@@ -108,6 +108,8 @@ public class Settings {
                     GUI.vis_p = new VisPolygon();
                 } else {
                     GUI.vis_p = null;
+                    geometry.EventHandler.clicks = 0;
+                    geometry.EventHandler.p_moving = false;
                     GUI.polygonscene.getChildren().clear();
                 }
             }
@@ -124,6 +126,24 @@ public class Settings {
 
         CheckBox realtime = new CheckBox();
         addCheckBox("Real Time Update", realtime);
+
+
+        // Polygon Drawer
+        // -------------------------------------
+        addSeparator("Polygon Drawer");
+
+        PolygonDrawer drawer = new PolygonDrawer();
+
+
+        Button drawlaby_right = new Button("Draw");
+        drawlaby_right.setFont(font);
+        drawlaby_right.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_Labyrinth_polygon();
+            }
+        });
+        addButton("Right-Sided Labyrinth", drawlaby_right);
 
         return gp;
     }

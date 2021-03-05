@@ -26,8 +26,8 @@ public class GUI extends Application {
 
         //set window sizes
         primary = primaryStage;
-        primaryStage.setWidth(1200);
-        primaryStage.setHeight(720);
+        primaryStage.setWidth(1600);
+        primaryStage.setHeight(900);
 
         //root as parent group, others as subgroups
         StackPane root = new StackPane();
@@ -58,7 +58,7 @@ public class GUI extends Application {
 
         //on click insert nodes of polygon
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler());
-//        scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler());
+        scene.addEventFilter(MouseEvent.MOUSE_MOVED, new RealTimeHandler());
 
         //add points to panel layer
         foreground.getChildren().add(this.pointscene);

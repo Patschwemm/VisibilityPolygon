@@ -107,7 +107,7 @@ public class Polygon {
         int count = 0;
         double x1 = p.getCenterX();
         double y1 = p.getCenterY();
-        double x2 = 5000;
+        double x2 = 10000;
         double y2 = p.getCenterY();
 
         for (int i =  0; i < EdgeList.size() -1; i++) {
@@ -178,8 +178,8 @@ public class Polygon {
     }
 
     public void move_p(double x, double y ){
-        this.p.setCenterX(x);
-        this.p.setCenterY(y);
+            this.p.setCenterX(x);
+            this.p.setCenterY(y);
     }
 
     public void set_p(double x, double y) {
