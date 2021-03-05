@@ -102,6 +102,34 @@ public class Polygon {
         return true;
     }
 
+    public boolean p_in_Polygon(Circle p) {
+
+        int count = 0;
+        double x1 = p.getCenterX();
+        double y1 = p.getCenterY();
+        double x2 = 5000;
+        double y2 = p.getCenterY();
+
+        for (int i =  0; i < EdgeList.size() -1; i++) {
+            double x3 = EdgeList.get(i).getStartX();
+            double y3 = EdgeList.get(i).getStartY();
+            double x4 = EdgeList.get(i).getEndX();
+            double y4 = EdgeList.get(i).getEndY();
+
+
+            if (Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
+                count ++;
+            }
+        }
+
+        if (count % 2 == 1){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
 
     public double inRange(Circle c1, Circle c2) {
         return ((Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
@@ -158,8 +186,12 @@ public class Polygon {
         this.p = createNode(x, y);
         this.p.setStroke(Color.DARKRED);
         this.p.setFill(Color.DARKRED);
-        this.is_p_set = true;
-        GUI.pointscene.getChildren().add(p);
+        if (p_in_Polygon(p)){
+            this.is_p_set = true;
+            GUI.pointscene.getChildren().add(p);
+        } else {
+            System.out.println("p not in polygon, set another p");
+        }
     }
 
 }

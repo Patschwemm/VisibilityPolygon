@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class VisPolygon extends Polygon {
@@ -14,8 +15,8 @@ public class VisPolygon extends Polygon {
     // List with Elements that belong to visibility polygon
     private ArrayList<Circle> VisPointList = new ArrayList<>(PointList.size());
     private ArrayList<Line> VisEdgeList = new ArrayList<>(PointList.size());
+    private double angle_sum = 0;
     private int p_idx;
-    private int v_counter = 0;
 
 
     public VisPolygon() {
@@ -49,20 +50,17 @@ public class VisPolygon extends Polygon {
         // calculate visible starting point (done in Pre-Processing)
         // ArrayList with visible point of polygon edge
         // Edge Point p_idx
-        // invert_angle = false for initial angle orientation
 
         int start = decrementIdx(p_idx);
 
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(0))).setFill(Color.BLUE);
+        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(0))).setFill(Color.RED);
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(1))).setFill(Color.RED);
 
 
         while (p_idx != start) {
             boundaryCycle(List, p);
-            System.out.println("start: " + start + " p_idx" + p_idx);
         }
 
-        System.out.println("NUMBER OF VERTIXES TRAVERSED: " + v_counter);
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.ORANGE);
         connectEdges(VisPointList);
         addToScene(GUI.polygonscene, VisEdgeList);
@@ -71,34 +69,30 @@ public class VisPolygon extends Polygon {
     private void boundaryCycle(ArrayList<Circle> List, Circle p) {
 
 
-        System.out.println("vispointsize: " + VisPointList.size());
-
         //if angle is correct add to vispoints
         p_idx = incrementIdx(p_idx);
-        v_counter++;
         //if signe is true means positive for the angle requirement (inverted or not) so visible
 
-        if (visibleAngle(VisPointList.get(VisPointList.size() - 1), p, List.get(p_idx)) == true) {
-            VisPointList.add(List.get(p_idx));
-        } else {
-            if (getEvent(VisPointList.get(VisPointList.size() - 1), p, List.get(p_idx), VisPointList.get(VisPointList.size() - 2), List)) {
 
-            } else {
-                // delete points that are hidden by this non visible edge
-                inner_turn_chain(List, p);
+        if (getEvent(List.get(decrementIdx(p_idx)), p, List.get(p_idx), List.get(decrementIdx(decrementIdx(p_idx))), List)) {
+
+        } else {
+            // delete points that are hidden by this non visible edge
+
+            inner_turn(List, p);
 //                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(VisPointList.size() - 1))).setFill(Color.YELLOW);
 //                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.WHITE);
 //                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(decrementIdx(p_idx)))).setFill(Color.YELLOW);
 
-            }
         }
-    }
 
+    }
 
 
     private boolean getEvent(Circle c, Circle p, Circle v2, Circle prev_v1, ArrayList<Circle> List) {
         double angle = 0;
         double prev_angle = 0;
+
 
         // x y coords of points v1
         double x_p = p.getCenterX() - c.getCenterX();
@@ -124,11 +118,28 @@ public class VisPolygon extends Polygon {
 
 
         System.out.println("angle: " + angle + " prev_angle" + prev_angle);
-        if (prev_angle < angle && prev_angle > 0) {
+
+        boolean outer_right_turn_event = prev_angle < angle && prev_angle > 0 && !visibleAngle(c, p, v2);
+        boolean outer_left_turn_event = prev_angle > angle && prev_angle < 0 && angle < 0;
+
+        if (outer_right_turn_event) {
             outer_right_turn(List, p);
             System.out.println("!!!");
             return true;
         }
+
+        if (outer_left_turn_event) {
+            outer_left_turn(List, p);
+            System.out.println("case reached");
+            return false;
+        }
+
+        if (visibleAngle(c, p, v2)) {
+            VisPointList.add(List.get(p_idx));
+            System.out.println("added " + p_idx);
+            return true;
+        }
+
 
         return false;
     }
@@ -136,22 +147,32 @@ public class VisPolygon extends Polygon {
     private void outer_right_turn(ArrayList<Circle> List, Circle p) {
 
         Circle c = VisPointList.get(VisPointList.size() - 1);
-        p_idx = incrementIdx(p_idx);
-        v_counter++;
-        System.out.println("p_idx " + p_idx);
+        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.GREEN);
+        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.GREENYELLOW);
 
-        while (visibleAngle(c, p, List.get(p_idx)) == false) {
-            System.out.println("angle: " + checkAngle(c, p, List.get(p_idx)));
+        update_angle_sum(p,p_idx);
+        p_idx = incrementIdx(p_idx);
+//        System.out.println("p_idx " + p_idx);
+
+
+
+//         add for special cases but erases simple cases cant be used normally checkAngle(c, p, List.get(p_idx)) > 90
+        while (visibleAngle(c, p, List.get(p_idx)) == false
+                || visibleAngle(List.get(decrementIdx(p_idx)), p, List.get(p_idx)) == false ||  angle_sum_exceeded() ) {
+//            System.out.println("angle: " + checkAngle(c, p, List.get(p_idx)));
             GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.GREEN);
-            System.out.println("p_idx: " + p_idx);
+//            System.out.println("p_idx: " + p_idx);
+            update_angle_sum(p,p_idx);
+            System.out.println("Bools: "+ (checkAngle(c, p, List.get(p_idx))) +" "+ (visibleAngle(List.get(decrementIdx(p_idx)), p, List.get(p_idx)) == false)  +" "+  angle_sum_exceeded());
             p_idx = incrementIdx(p_idx);
-            v_counter++;
         }
+
+        System.out.println("angle to c and p_idx: " +checkAngle(c, p, List.get(p_idx)));
 
         //create point of intersection
         Circle s_v =  new Circle();
 
-        s_v = lineLineIntersection(c, p, List.get(p_idx), List.get(decrementIdx(p_idx)));
+        s_v = lineLineIntersection(c, p, List.get(decrementIdx(p_idx)), List.get(p_idx));
 
 
         if (s_v == null) {
@@ -164,89 +185,54 @@ public class VisPolygon extends Polygon {
 
     }
 
+    private void outer_left_turn(ArrayList<Circle> List, Circle p) {
 
-    private void inner_turn_chain(ArrayList<Circle> List, Circle p) {
+        int current_corner = p_idx;
 
-//        double angle = 0;
-//        double prev_angle = 0;
-//        boolean chain_check;
-//        boolean inner_turn_chain;
-//        boolean outer_left_turn;
-//        boolean outer_left_turn_chain;
-//        boolean inner_turn_end_condition;
-//
-//        do{
-//
-//            // x y coords of points v1
-//            double x_p = p.getCenterX() - List.get(p_idx).getCenterX();
-//            double y_p = p.getCenterY() - List.get(p_idx).getCenterY();
-//
-//            // x y coords of points v2
-//            double x_v2 = List.get(incrementIdx(p_idx)).getCenterX() - List.get(p_idx).getCenterX();
-//            double y_v2 = List.get(incrementIdx(p_idx)).getCenterY() - List.get(p_idx).getCenterY();
-//
-//            // x y coords of prev_v1
-//            double x_prev = List.get(decrementIdx(p_idx)).getCenterX() - List.get(p_idx).getCenterX();
-//            double y_prev = List.get(decrementIdx(p_idx)).getCenterY() - List.get(p_idx).getCenterY();
-//
-//            // angle between line of p and current vertex
-//            angle = Math.atan2(x_v2 * y_p - y_v2 * x_p, x_v2 * x_p + y_v2 * y_p) * 180 / Math.PI;
-//            // angle between line of p and prev vertex
-//            prev_angle = Math.atan2(x_prev * y_p - y_prev * x_p, x_prev * x_p + y_prev * y_p) * 180 / Math.PI;
-//
-//
-//            System.out.println("angle: " + angle);
-//            System.out.println("prev_angle: " + prev_angle);
-//
-//
-//            inner_turn_chain = visibleAngle(List.get(decrementIdx(p_idx)), p, List.get(p_idx))== false;
-//            outer_left_turn = (prev_angle < angle  && (angle < 0 && prev_angle <0));
-//            outer_left_turn_chain = (prev_angle > 0 && angle < 0);
-//            inner_turn_end_condition= (prev_angle < 0 && angle > 0 );
-//
-//
-//            chain_check = (inner_turn_chain || outer_left_turn || outer_left_turn_chain ) && !inner_turn_end_condition;
-//
-//
-//            if (!inner_turn_end_condition){
-//
-//                System.out.println(" \n Skipped \n");
-//
-//                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.BROWN);
-//                p_idx = incrementIdx(p_idx);
-//            }
-//
-//        } while(!inner_turn_end_condition);
+        while (visibleAngle(List.get(current_corner), p, List.get(incrementIdx(p_idx))) == true) {
+            System.out.println("angle: " + checkAngle(List.get(current_corner), p, List.get(p_idx)));
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.BROWN);
+            System.out.println("p_idx: " + p_idx);
+            p_idx = incrementIdx(p_idx);
+        }
+        //outer_left_turn chain skipped
+        p_idx = incrementIdx(p_idx);
+    }
+
+
+    private void inner_turn(ArrayList<Circle> List, Circle p) {
 
 
         Circle p_top = new Circle();
 
+
         //deletes all vertices left to the vector pc
         while (visibleAngle(List.get(p_idx), p, VisPointList.get(VisPointList.size() - 1)) == true) {
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(VisPointList.size()-1))).setFill(Color.BLUE);
-            System.out.println("visibility? " + visibleAngle(VisPointList.get(VisPointList.size() - 1), p, List.get(p_idx)));
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(List.get(p_idx))).setFill(Color.BLUE);
+            try {
+                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(VisPointList.get(VisPointList.size() - 1))).setFill(Color.BLUE);
+            } catch (Exception e) {
+                System.out.println("invalid Starting Points found");
+            }
+            ;
             p_top = VisPointList.get(VisPointList.size() - 1);
             VisPointList.remove(VisPointList.size() - 1);
-            System.out.println("removed point, new size: " + VisPointList.size());
         }
 
         p_top = lineLineIntersection(p, List.get(p_idx), p_top, VisPointList.get(VisPointList.size() - 1));
-
 
 
         if (p_top == null) {
         }
 
 
-        System.out.println("?????");
-        System.out.println("vispointsize: " + VisPointList.size());
+        System.out.println("????? \n ");
+
         VisPointList.add(p_top);
         VisPointList.add(List.get(p_idx));
-        GUI.polygon.addNode(p_top.getCenterX(),p_top.getCenterY());
-        System.out.println("vispointsize: " + VisPointList.size());
+        GUI.polygon.addNode(p_top.getCenterX(), p_top.getCenterY());
 
     }
-
 
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -282,45 +268,22 @@ public class VisPolygon extends Polygon {
         for (int i = 0; i < PointList.size(); i++) {
 
             //check and save idx
-            if (smallest_dist >= inRange(p, PointList.get(i))) {
-                smallest_dist = inRange(p, PointList.get(i));
+            System.out.println("distance : " + closest_distance_to_linesegment(PointList.get(i), PointList.get(incrementIdx(i)), p));
+            if (smallest_dist >= closest_distance_to_linesegment(PointList.get(i), PointList.get(incrementIdx(i)), p)
+                    && visibleAngle(PointList.get(i),p, PointList.get(incrementIdx(i)))) {
+                smallest_dist = closest_distance_to_linesegment(PointList.get(i), PointList.get(incrementIdx(i)), p);
                 idx = i;
             }
         }
 
-        //three cases, idx is 0 so connecting node is at end of List, or idx is at end so connectin node is at beginning
+        System.out.println("smallest_dist: " + smallest_dist);
+        // idx is 0 so connecting node is at end of List, or idx is at end so connectin node is at beginning
         // check both adjacent nodes one must be visible ( with positive angle)
-        if (idx == PointList.size() - 1) {
-            if (checkAngle(PointList.get(idx - 1), p, PointList.get(idx)) > 0) {
-                VisPointList.add(PointList.get(idx - 1));
-                VisPointList.add(PointList.get(idx));
-                p_idx = idx;
-            } else {
-                VisPointList.add(PointList.get(idx));
-                VisPointList.add(PointList.get(0));
-                p_idx = 0;
-            }
-        } else if (idx == 0) {
-            if (checkAngle(PointList.get(PointList.size() - 1), p, PointList.get(idx)) > 0) {
-                VisPointList.add(PointList.get(PointList.size() - 1));
-                VisPointList.add(PointList.get(idx));
-                p_idx = idx;
-            } else {
-                VisPointList.add(PointList.get(idx));
-                VisPointList.add(PointList.get(idx + 1));
-                p_idx = idx + 1;
-            }
-        } else {
-            if (checkAngle(PointList.get(idx - 1), p, PointList.get(idx)) > 0) {
-                VisPointList.add(PointList.get(idx - 1));
-                VisPointList.add(PointList.get(idx));
-                p_idx = idx;
-            } else {
-                VisPointList.add(PointList.get(idx));
-                VisPointList.add(PointList.get(idx + 1));
-                p_idx = idx + 1;
-            }
-        }
+
+        VisPointList.add(PointList.get(idx));
+        VisPointList.add(PointList.get(incrementIdx(idx)));
+        p_idx = incrementIdx(idx);
+
 
         System.out.println("Vispoint  x y : " + VisPointList.get(0).getCenterX() + " " + VisPointList.get(0).getCenterY() + " " + VisPointList.get(1).getCenterX() + " " + VisPointList.get(1).getCenterY());
     }
@@ -427,10 +390,74 @@ public class VisPolygon extends Polygon {
         }
     }
 
+
+    private double closest_distance_to_linesegment(Circle c1, Circle c2, Circle p) {
+
+        //dot product
+        double dx = c2.getCenterX() - c1.getCenterX();
+        double dy = c2.getCenterY() - c1.getCenterY();
+
+        double px = p.getCenterX();
+        double py = p.getCenterY();
+
+        double c1x = c1.getCenterX();
+        double c1y = c1.getCenterY();
+
+        double c2x = c2.getCenterX();
+        double c2y = c2.getCenterY();
+
+        double dot = ((px - c1x) * dx + (py - c1y) * dy);
+        double len_sq = (dx * dx + dy * dy);
+
+        double param = dot / len_sq;
+
+        //new point on linesegment which is closest to p
+        double x;
+        double y;
+
+        if (param < 0) {
+            //closest point is c1
+            x = c1x;
+            y = c1y;
+
+        } else if (param > 1) {
+            //closest point is c2
+            x = c2x;
+            y = c2y;
+
+        } else {
+            //calculate point on line as closest point
+            x = c1x + param * dx;
+            y = c1y + param * dy;
+        }
+
+        dx = px - x;
+        dy = py - y;
+
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+
 // ----------------------------------------------------------------------------------------------------------------
 // List, Point, idx handling
 // ----------------------------------------------------------------------------------------------------------------
 
+    private void update_angle_sum( Circle p ,int p_idx) {
+        angle_sum += checkAngle(PointList.get(decrementIdx(p_idx)),p,PointList.get(p_idx));
+        if (angle_sum >= 0) {
+            angle_sum = 0;
+        }
+    }
+
+    private boolean angle_sum_exceeded (){
+        if (angle_sum < -180){
+            System.out.println("angle sum exceeded: "+ angle_sum);
+            return true;
+        } else {
+            System.out.println("angle sum not exceeded: "+ angle_sum);
+            return false;
+        }
+    }
 
     private int incrementIdx(int idx) {
         idx++;
