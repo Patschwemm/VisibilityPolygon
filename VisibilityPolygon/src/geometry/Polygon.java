@@ -1,8 +1,10 @@
 package geometry;
 
 
+import java.awt.*;
 import java.awt.geom.Line2D;
 
+import com.sun.javafx.geom.Edge;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -12,7 +14,6 @@ import java.util.Stack;
 
 public class Polygon {
 
-    private Stack<Circle> P = new Stack<>();
     private ArrayList<Circle> PointList = new ArrayList<>(50);
     private ArrayList<Line> EdgeList = new ArrayList<>(50);
     private Circle p = null;
@@ -24,7 +25,7 @@ public class Polygon {
 
         Circle point = this.createNode(x, y);
 
-        if (PointList.size() != 0 && this.inRange(PointList.get(0), point)<= 15 ) {
+        if (PointList.size() != 0 && this.inRange(PointList.get(0), point) <= 15) {
             if (PointList.size() <= 2) {
                 System.out.println("tried to draw Polygon with 2 or less nodes");
             } else {
@@ -62,6 +63,7 @@ public class Polygon {
         }
     }
 
+
     public Circle createNode(double x, double y) {
         //create new Point as Polygon node
         Circle point = new Circle();
@@ -88,7 +90,7 @@ public class Polygon {
         double x2 = edge.getEndX();
         double y2 = edge.getEndY();
 
-        for (int i = (connector) ? 1 : 0; i < EdgeList.size() -1; i++) {
+        for (int i = (connector) ? 1 : 0; i < EdgeList.size() - 1; i++) {
             double x3 = EdgeList.get(i).getStartX();
             double y3 = EdgeList.get(i).getStartY();
             double x4 = EdgeList.get(i).getEndX();
@@ -104,36 +106,21 @@ public class Polygon {
 
     public boolean p_in_Polygon(Circle p) {
 
-        int count = 0;
-        double x1 = p.getCenterX();
-        double y1 = p.getCenterY();
-        double x2 = 10000;
-        double y2 = p.getCenterY();
-
-        for (int i =  0; i < EdgeList.size() -1; i++) {
-            double x3 = EdgeList.get(i).getStartX();
-            double y3 = EdgeList.get(i).getStartY();
-            double x4 = EdgeList.get(i).getEndX();
-            double y4 = EdgeList.get(i).getEndY();
-
-
-            if (Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
-                count ++;
-            }
+        double total_angle = 0;
+        for (int i = 0; i < EdgeList.size(); i++) {
+            total_angle += checkAngle(PointList.get(i), p, PointList.get(incrementIdx(i)));
         }
-
-        if (count % 2 == 1){
+        if (Math.round(total_angle) != 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
-
     }
 
 
     public double inRange(Circle c1, Circle c2) {
         return ((Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
-                + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))) );
+                + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))));
     }
 
     public void deletePolygon() {
@@ -146,10 +133,40 @@ public class Polygon {
         this.isPolygonDrawn = false;
     }
 
+    // v1 first node, v2 second node, p point of visibility
+    public double checkAngle(Circle v1, Circle p, Circle v2) {
+
+        double angle = 0;
+        double x1 = v1.getCenterX() - p.getCenterX();
+        double y1 = v1.getCenterY() - p.getCenterY();
+        double x2 = v2.getCenterX() - p.getCenterX();
+        double y2 = v2.getCenterY() - p.getCenterY();
+
+        //determinant and skalar product
+        angle = Math.atan2(x2 * y1 - y2 * x1, x2 * x1 + y2 * y1) * 180 / Math.PI;
+
+        return angle;
+    }
+
 
     // ------------------------------------------------------------------------------------------------
     // Getters and Setters
     // ------------------------------------------------------------------------------------------------
+
+    //increments so that if idx = last polygon node +1 -> idx = 0, first polygo node
+    public int incrementIdx(int idx) {
+        idx++;
+        idx = idx % PointList.size();
+        return idx;
+    }
+
+    //increments so that if idx = 0, first polygon node -> idx = last polygon node
+    public int decrementIdx(int idx) {
+        idx--;
+        idx = idx + PointList.size();
+        idx = idx % PointList.size();
+        return idx;
+    }
 
 
     public void setPolygonDrawn() {
@@ -177,18 +194,28 @@ public class Polygon {
         return this.p;
     }
 
-    public void move_p(double x, double y ){
+    public void move_p(double x, double y) {
+        if (p_in_Polygon(p)) {
             this.p.setCenterX(x);
             this.p.setCenterY(y);
+        } else {
+            System.out.println("Out of Bounds, deleting p. \n Set a new p");
+            p = null;
+            this.is_p_set = false;
+            GUI.pointscene.getChildren().remove(GUI.pointscene.getChildren().size()-1);
+            EventHandler.p_moving = false;
+            EventHandler.clicks = 0;
+        }
     }
 
     public void set_p(double x, double y) {
         this.p = createNode(x, y);
         this.p.setStroke(Color.DARKRED);
         this.p.setFill(Color.DARKRED);
-        if (p_in_Polygon(p)){
+        if (p_in_Polygon(p)) {
             this.is_p_set = true;
             GUI.pointscene.getChildren().add(p);
+            System.out.println("p in polygon");
         } else {
             System.out.println("p not in polygon, set another p");
         }
