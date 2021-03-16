@@ -22,8 +22,6 @@ public class VisPolygon extends Polygon {
     private int p_idx;
     private Circle vi_prev;
     private boolean inner_turn_before = false;
-    private boolean dot_collinear = false;
-
 
 
     public VisPolygon() {
@@ -60,7 +58,7 @@ public class VisPolygon extends Polygon {
 
         vi_prev = get_second_peek(S);
         //cycles through all nodes of polygon
-        while (!(P.size()<=1 )) {
+        while (!(P.size() <= 1)) {
             boundaryCycle(P, S, p, start);
             System.out.println("P size: " + P.size());
             System.out.println("S size: " + S.size());
@@ -76,23 +74,27 @@ public class VisPolygon extends Polygon {
 
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
 
-        while (!getEvent(S.peek(), p, P.peek(), vi_prev, P, S)){
+        while (!getEvent(S.peek(), p, P.peek(), vi_prev, P, S)) {
 
             System.out.println("boundary cycling");
             System.out.println("P size: " + P.size());
             System.out.println("S size: " + S.size());
-            System.out.println("visible angle: "+ visibleAngle(S.peek(),p,P.peek()));
+            System.out.println("visible angle: " + visibleAngle(S.peek(), p, P.peek()));
 
-            if (angle_orient == "left") {
-                vi_prev = S.peek();
-                S.push(P.pop());
-            } else if (angle_orient == "right") {
-                System.out.println("delete covered points entered");
-                delete_covered_points(P, S, p, S.peek());
-            }
+            //if ("angle orient left")
+            vi_prev = S.peek();
+            S.push(P.pop());
+            inner_turn_before = false;
+
+
+
+//             else if (angle_orient == "right") {
+//                System.out.println("delete covered points entered");
+//                delete_covered_points(P, S, p, S.peek());
+//            }
 
             //catch stackempt exception, Algorithm done by this point
-            if (P.size() <= 1 ){
+            if (P.size() <= 1) {
                 S.pop();
                 break;
             }
@@ -104,7 +106,6 @@ public class VisPolygon extends Polygon {
     private boolean getEvent(Circle c, Circle p, Circle v2, Circle prev_v1, Stack<Circle> P, Stack<Circle> S) {
         double angle = 0;
         double prev_angle = 0;
-
 
 
         // x y coords of points v1
@@ -129,75 +130,78 @@ public class VisPolygon extends Polygon {
         //turn outer right: angle bigger than prev_angle
         //turn outer left: angle bigger than prev_angle and previous vertex not visible
 
-        boolean collinear =  Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || Math.round(prev_angle) == 0;
-        boolean inner_turn_event = ((prev_angle > angle && angle > 0 && prev_angle > 0)
+        boolean collinear = Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || (Math.round(prev_angle) == 0 && angle < 0);
+        boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
                 || (prev_angle < angle && angle < 0 && prev_angle < 0)
-                || ( prev_angle < 0 && angle > 0)) &&  visibleAngle(c,p,v2) == false && !collinear;
-        boolean outer_right_turn_event = (prev_angle < angle && prev_angle >= 0
-                && !visibleAngle(c, p, v2)  && !collinear)
-                || (Math.round(angle) == 90 && Math.round(prev_angle) == 0);
-        boolean outer_left_turn_event = (prev_angle > angle && angle < 0 && prev_angle < 0)
-                && !visibleAngle(prev_v1,p,c) && visibleAngle(c,p,v2)
-                && inner_turn_before == true  && !collinear;
+                || (Math.round(prev_angle) < 0 && angle > 0)) && visibleAngle(c, p, v2) == false && !collinear;
+        boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
+                && !visibleAngle(c, p, v2) && !collinear)
+                || (Math.round(angle) == 90 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
+        boolean outer_left_turn_event = (((prev_angle > angle && angle < 0 && prev_angle < 0)
+                && !visibleAngle(prev_v1, p, c) && visibleAngle(c, p, v2)
+                 && !collinear)
+                || (Math.round(angle) == -180 && Math.round(prev_angle) == -90)
+                || (Math.round(angle) == 180 && Math.round(prev_angle) == -90)
+                || (Math.round(angle) == -90 && Math.round(prev_angle) == 0))
+                && inner_turn_before == true;
 
-        System.out.println("angle: "+ angle+ " prev_angle: "+ prev_angle);
+        System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
         if (inner_turn_event) {
             System.out.println("inner turn entered");
 //            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.YELLOW);
 //            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.YELLOW);
 //            angle_orient_invert();
             vi_prev = S.peek();
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.BLUE);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.BLUE);
             delete_covered_points(P, S, p, P.peek());
             return true;
         }
 
-
-        if (outer_right_turn_event ) {
-            System.out.println("outer right turn entered");
-            vi_prev = S.peek();
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
-
-            FastForwardIntersect(P, S, p, c);
-            return true;
-        }
-
-        if (outer_left_turn_event)  {
+        if (outer_left_turn_event) {
             System.out.println("outer left turn entered");
             FastForward(P, S, p, c);
             return true;
         }
+
+        if (outer_right_turn_event) {
+            System.out.println("outer right turn entered");
+            vi_prev = S.peek();
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
+
+            ForwardIntersect(P, S, p, c);
+            return true;
+        }
+
         return false;
     }
 
-    private void FastForwardIntersect(Stack<Circle> P, Stack<Circle> S, Circle p, Circle c) {
+    private void ForwardIntersect(Stack<Circle> P, Stack<Circle> S, Circle p, Circle c) {
         Circle intersect_v = new Circle();
         Circle p_prev = new Circle();
-        System.out.println("check angle:"+ checkAngle(S.peek(), p,P.peek()));
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.BLUE);
+        System.out.println("check angle:" + checkAngle(S.peek(), p, P.peek()));
+        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.GREENYELLOW);
+        update_angle_sum(S.peek(), p, P.peek());
+        update_angle_sum(P.peek(), p, get_second_peek(P));
 
 
-
-
-        while ((lineLineSegIntersection(p, c, P.peek(), get_second_peek(P)) == false  || angle_sum_exceeded()) ) {
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
-            System.out.println("in Fast ForwardIntersect");
-            System.out.println("check angle:"+ checkAngle( P.peek(),p, get_second_peek(P)));
-//            if (dot_collinear==true && !angle_sum_exceeded()){
-//                System.out.println("broke out");
-//                P.push(p_prev);
-//                break;
-//            }
-            p_prev = P.pop();
-            update_angle_sum(P.peek(), p, get_second_peek(P));
+        while (lineLineSegIntersection(p, c, P.peek(), get_second_peek(P)) == false ) {
+            while( angle_sum_exceeded()) {
+                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
+                System.out.println("in Fast Forward Intersect");
+                System.out.println("check angle:" + checkAngle(P.peek(), p, get_second_peek(P)));
+                p_prev = P.pop();
+                update_angle_sum(P.peek(), p, get_second_peek(P));
+            }
         }
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
+
 
         //line intersection of 4 points (2 node for first edge, 2 for second edge)
         intersect_v = lineLineIntersection(p, c, P.peek(), get_second_peek(P));
         System.out.println("intersection created");
 
+        P.pop();
         S.push(intersect_v);
         S.push(P.pop());
         inner_turn_before = false;
@@ -205,30 +209,31 @@ public class VisPolygon extends Polygon {
     }
 
     private void FastForward(Stack<Circle> P, Stack<Circle> S, Circle p, Circle c) {
-        System.out.println("check angle:"+ checkAngle(S.peek(), p,P.peek()));
+        System.out.println("check angle:" + checkAngle(S.peek(), p, P.peek()));
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.GRAY);
 
 
-        while ((visibleAngle(P.peek() ,p, get_second_peek(S))==false) ) {
+        while ((visibleAngle(P.peek(), p, get_second_peek(S)) == false)) {
+            System.out.println("In FAST FORWARD      checkangle: "+ checkAngle(P.peek(), p, get_second_peek(S)));
             GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
-            System.out.println("in Fast Forward");
+
             vi_prev = P.pop();
         }
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
-        inner_turn_before = false;
+        inner_turn_before = true;
+        delete_covered_points(P, S, p, P.peek());
+
     }
 
 
     private void delete_covered_points(Stack<Circle> P, Stack<Circle> S, Circle p, Circle c) {
         //circle as new artificial edge node point
         Circle intersect_v = new Circle();
-        update_angle_sum(S.peek(), p, get_second_peek(S));
 
 
         //deletes all vertices left to the vector pc
         // || angle_sum_exceeded()
-        while ((lineLineSegIntersection(p, c, S.peek(),get_second_peek(S) ) == false) ) {
-            update_angle_sum(S.peek(), p, get_second_peek(S));
+        while ((lineLineSegIntersection(p, c, S.peek(), get_second_peek(S)) == false)) {
             System.out.println("in delete covered points");
 //            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.WHITE);
 //            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(get_second_peek(S))).setFill(Color.WHITE);
@@ -239,15 +244,17 @@ public class VisPolygon extends Polygon {
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.DARKCYAN);
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S_prev)).setFill(Color.DARKCYAN);
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
-        //line intersection of 4 points (2 node for first edge, 2 for second edge)
-        intersect_v = lineLineIntersection(p, c, S.peek(),get_second_peek(S));
 
+        //line intersection of 4 points (2 node for first edge, 2 for second edge)
+        intersect_v = lineLineIntersection(p, c, S.peek(), get_second_peek(S));
+        S.pop();
 
         S.push(intersect_v);
         S.push(P.pop());
+
         System.out.println("intersection created");
         inner_turn_before = true;
-        reset_angle();
+
 
     }
 
@@ -281,13 +288,13 @@ public class VisPolygon extends Polygon {
         double smallest_dist = 10000;
         int idx = 0;
         for (int i = 0; i < PointList.size(); i++) {
-            System.out.println("distance: "+ closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p));
+            System.out.println("distance: " + closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p));
             //smallest distance to visible edge is strating point that can be added to visiblity polygon
             if (smallest_dist >= closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p)
                     && visibleAngle(PointList.get(i), p, PointList.get(decrementIdx(i)))) {
                 smallest_dist = closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p);
                 idx = i;
-                System.out.println("smallest distance: "+ closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p));
+                System.out.println("smallest distance: " + closest_distance_to_linesegment(PointList.get(i), PointList.get(decrementIdx(i)), p));
 
             }
         }
@@ -309,7 +316,6 @@ public class VisPolygon extends Polygon {
 
         return checkAngle(v1, p, v2) > 0;
     }
-
 
 
     //finds intersection of edges given bei 2 points each
@@ -340,43 +346,37 @@ public class VisPolygon extends Polygon {
     //finds intersection of edges given bei 2 points each
     private boolean lineLineSegIntersection(Circle A, Circle B, Circle C, Circle D) {
 
-        dot_collinear=false;
         //construct normal vector to line AB
-        double n_x =  A.getCenterX() - B.getCenterX();
+        double n_x = A.getCenterX() - B.getCenterX();
         double n_y = A.getCenterY() - B.getCenterY();
 
         //vector CB
-        double ca_x = A.getCenterX()-C.getCenterX();
-        double ca_y = A.getCenterY()-C.getCenterY();
+        double ca_x = A.getCenterX() - C.getCenterX();
+        double ca_y = A.getCenterY() - C.getCenterY();
 
         //vector CB
-        double da_x = A.getCenterX()-D.getCenterX();
-        double da_y = A.getCenterY()-D.getCenterY();
+        double da_x = A.getCenterX() - D.getCenterX();
+        double da_y = A.getCenterY() - D.getCenterY();
 
         //dot product of both Points C and D, sign check afterwards
         double dot_c = n_x * ca_y - n_y * ca_x;
         double dot_d = n_x * da_y - n_y * da_x;
 
-        System.out.println("dot_c: "+ dot_c);
-        System.out.println("dot_d: "+ dot_d);
+        System.out.println("dot_c: " + dot_c);
+        System.out.println("dot_d: " + dot_d);
 
 
         //different signs mean there is an intersection
 
 
-
-        if ( Math.signum(dot_d) != Math.signum(dot_c) || dot_c == 0 || dot_d == 0){
+        if (Math.signum(dot_d) != Math.signum(dot_c) || dot_c == 0 || dot_d == 0) {
             System.out.println("intersection of segment");
-            if ( dot_c == 0 || dot_d == 0){
-                dot_collinear = true;
-            }
             return true;
         } else {
             System.out.println(" no  intersection of segment");
             return false;
         }
     }
-
 
 
     //test orientation of the input polygon
@@ -480,29 +480,22 @@ public class VisPolygon extends Polygon {
         if (angle_sum >= 0) {
             angle_sum = 0;
         }
-        System.out.println("angle sum: "+ angle_sum);
+        System.out.println("angle sum: " + angle_sum);
     }
 
     // orientation test addition to angle sum
     private boolean angle_sum_exceeded() {
-        if (Math.round(angle_sum) < 0.0) {
+        if (angle_sum < 0.0) {
             return true;
         } else {
             return false;
         }
     }
 
-    private void reset_angle(){
+    private void reset_angle() {
         angle_sum = 0;
     }
 
-    private void angle_orient_invert() {
-        if (angle_orient == "left") {
-            angle_orient = "right";
-        } else if (angle_orient == "right") {
-            angle_orient = "left";
-        }
-    }
 
 // ----------------------------------------------------------------------------------------------------------------
 // List, Point, idx handling
@@ -530,15 +523,14 @@ public class VisPolygon extends Polygon {
         Circle prev;
         Circle current;
         current = Stack.pop();
-        if(P.size() <= 1){
+        if (P.size() <= 1) {
             prev = S.lastElement();
-        }else {
+        } else {
             prev = Stack.peek();
         }
         Stack.push(current);
         return prev;
     }
-
 
 
     //clears VisPolygon
@@ -575,7 +567,7 @@ public class VisPolygon extends Polygon {
 
 
         int stack_size = S.size();
-        for (int i = 0; i < stack_size ; i++) {
+        for (int i = 0; i < stack_size; i++) {
 
             vis_polygon.getPoints().addAll(S.peek().getCenterX(), S.pop().getCenterY());
         }

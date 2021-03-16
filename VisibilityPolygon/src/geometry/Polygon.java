@@ -202,7 +202,7 @@ public class Polygon {
             System.out.println("Out of Bounds, deleting p. \n Set a new p");
             p = null;
             this.is_p_set = false;
-            GUI.pointscene.getChildren().remove(GUI.pointscene.getChildren().size()-1);
+            GUI.pointscene.getChildren().remove(GUI.pointscene.getChildren().size() - 1);
             EventHandler.p_moving = false;
             EventHandler.clicks = 0;
         }
@@ -219,7 +219,16 @@ public class Polygon {
         } else {
             System.out.println("p not in polygon, set another p");
         }
+
+    }
+
+    public void colorBlack() {
+        for(int i = 0; i < PointList.size(); i++){
+            PointList.get(i).setFill(Color.BLACK);
+        }
     }
 
 }
+
+
 
