@@ -14,16 +14,16 @@ import java.util.Stack;
 
 public class Polygon {
 
-    private ArrayList<Circle> PointList = new ArrayList<>(50);
+    private ArrayList<Point> PointList = new ArrayList<>(50);
     private ArrayList<Line> EdgeList = new ArrayList<>(50);
-    private Circle p = null;
+    private Point p = null;
     private boolean isPolygonDrawn = false;
     private boolean is_p_set = false;
 
 
     public void addNode(double x, double y) {
 
-        Circle point = this.createNode(x, y);
+        Point point = this.createNode(x, y);
 
         if (PointList.size() != 0 && this.inRange(PointList.get(0), point) <= 15) {
             if (PointList.size() <= 2) {
@@ -64,9 +64,9 @@ public class Polygon {
     }
 
 
-    public Circle createNode(double x, double y) {
+    public Point createNode(double x, double y) {
         //create new Point as Polygon node
-        Circle point = new Circle();
+        Point point = new Point();
         point.toFront();
         point.setCenterX(x);
         point.setCenterY(y);
@@ -104,7 +104,7 @@ public class Polygon {
         return true;
     }
 
-    public boolean p_in_Polygon(Circle p) {
+    public boolean p_in_Polygon(Point p) {
 
         double total_angle = 0;
         for (int i = 0; i < EdgeList.size(); i++) {
@@ -118,7 +118,7 @@ public class Polygon {
     }
 
 
-    public double inRange(Circle c1, Circle c2) {
+    public double inRange(Point c1, Point c2) {
         return ((Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
                 + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))));
     }
@@ -134,7 +134,7 @@ public class Polygon {
     }
 
     // v1 first node, v2 second node, p point of visibility
-    public double checkAngle(Circle v1, Circle p, Circle v2) {
+    public double checkAngle(Point v1, Point p, Point v2) {
 
         double angle = 0;
         double x1 = v1.getCenterX() - p.getCenterX();
@@ -181,16 +181,16 @@ public class Polygon {
         return this.is_p_set;
     }
 
-    public void setPointList(ArrayList<Circle> pointList) {
+    public void setPointList(ArrayList<Point> pointList) {
         this.PointList = pointList;
     }
 
-    public ArrayList<Circle> getPointList() {
+    public ArrayList<Point> getPointList() {
         return PointList;
     }
 
 
-    public Circle get_p() {
+    public Point get_p() {
         return this.p;
     }
 
