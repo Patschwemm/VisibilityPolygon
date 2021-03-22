@@ -145,6 +145,16 @@ public class Settings {
         });
         addButton("Right-Sided Labyrinth", drawlaby_right);
 
+        Button draw_s = new Button("Draw");
+        draw_s.setFont(font);
+        draw_s.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_S_polygon();
+            }
+        });
+        addButton("S polygon", draw_s);
+
         return gp;
     }
 
