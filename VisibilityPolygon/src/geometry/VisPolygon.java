@@ -142,10 +142,11 @@ public class VisPolygon extends Polygon {
         boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
                 || (prev_angle < angle && angle < 0 && Math.round(prev_angle) <= 0)
                 || (((Math.round(angle) == 180) || (Math.round(angle) == -180)) && prev_angle < 0)
-                || (Math.round(prev_angle) < 0 && angle > 0)) && visibleAngle(c, p, v2) == false;
+                || (prev_angle < 0 && angle > 0)) && visibleAngle(c, p, v2) == false && !collinear
+                && !(angle > 0 && Math.round(prev_angle) ==0);
         boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
                 && !visibleAngle(c, p, v2) && !collinear)
-                || (Math.round(angle) == 90 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
+                || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
         boolean outer_left_turn_event = (((prev_angle > angle && angle < 0 && prev_angle < 0)
                 && !visibleAngle(prev_v1, p, c) && visibleAngle(c, p, v2)
                 && !collinear)
@@ -225,10 +226,17 @@ public class VisPolygon extends Polygon {
 //        } else {
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
 
+        System.out.println(" °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°p.size:"+ P.size());
+        System.out.println(P.peek());
+        System.out.println(get_second_peek(P));
+        System.out.println(S.lastElement());
+        System.out.println(S.firstElement());
+        System.out.println(" °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
 
         //line intersection of 4 points (2 node for first edge, 2 for second edge)
         intersect_v = lineLineIntersection(p, c, P.peek(), get_second_peek(P));
         System.out.println("intersection created");
+        System.out.println(intersect_v);
         intersect_v.setPointLinked(c);
 
                         System.out.println("range: c " + inRange(p, c) + " linkp: " + inRange(p, intersect_v));
@@ -282,7 +290,7 @@ public class VisPolygon extends Polygon {
 
     private void fastForward(Stack<Point> P, Stack<Point> S, Point p, Point c) {
         System.out.println("check angle:" + checkAngle(S.peek(), p, P.peek()));
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.GRAY);
+//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.GRAY);
 
 
         while ((visibleAngle(P.peek(), p, get_second_peek(S)) == false)) {
@@ -356,6 +364,8 @@ public class VisPolygon extends Polygon {
 
             S.push(intersect_v);
             S.push(P.pop());
+
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
 
             System.out.println("intersection created");
             inner_turn_before = true;
@@ -507,7 +517,7 @@ public class VisPolygon extends Polygon {
     //returns true for left orientation of points, false for right orientation
     private boolean visibleAngle(Point v1, Point p, Point v2) {
 
-        return checkAngle(v1, p, v2) > 0;
+        return checkAngle(v1, p, v2) >= 0;
     }
 
 
@@ -761,7 +771,7 @@ public class VisPolygon extends Polygon {
         Point point;
         point = Stack.pop();
         try{
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(point)).setFill(Color.GRAY);
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(point)).setFill(Color.WHITE);
         }catch (Exception e){
             System.out.println("error: "+ e);
         }
@@ -796,13 +806,14 @@ public class VisPolygon extends Polygon {
         Point prev;
         Point current;
 
-        if (S.size() <= 1) {
-            return S.peek();
-        }
+//        if (S.size() <= 1) {
+//            return S.peek();
+//        }
 
         current = Stack.pop();
-        if (P.size() <= 1) {
+        if (P.size() == 0) {
             prev = S.lastElement();
+
         } else {
             prev = Stack.peek();
         }
