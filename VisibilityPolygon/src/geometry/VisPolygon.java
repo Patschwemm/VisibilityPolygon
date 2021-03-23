@@ -231,7 +231,8 @@ public class VisPolygon extends Polygon {
         System.out.println("intersection created");
         intersect_v.setPointLinked(c);
 
-        if (inRange(p, c) > inRange(p, intersect_v)) {
+                        System.out.println("range: c " + inRange(p, c) + " linkp: " + inRange(p, intersect_v));
+        if (inRange(p, c) >= inRange(p, intersect_v)) {
 //                linked = popLinkedChain(S,c,c_prev,null);
             linked = popLinkedChain(S, c_prev, c_prev_prev, null);
 
@@ -422,7 +423,7 @@ public class VisPolygon extends Polygon {
         System.out.println("range p link: "+ inRange(p,linkpoint) + " p intersect: "+ inRange(p,intersect_v));
         System.out.println("linkpoint: "+linkpoint);
         System.out.println("intersect point:" + intersect_v);
-        if( inRange(p,linkpoint) > inRange(p,intersect_v)){
+        if( inRange(p,linkpoint) >= inRange(p,intersect_v)){
             while (R.size() != 0){
                 P.push(R.pop());
             }
