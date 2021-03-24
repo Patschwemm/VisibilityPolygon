@@ -143,7 +143,8 @@ public class VisPolygon extends Polygon {
                 || (prev_angle < angle && angle < 0 && Math.round(prev_angle) <= 0)
                 || (((Math.round(angle) == 180) || (Math.round(angle) == -180)) && prev_angle < 0)
                 || (prev_angle < 0 && angle > 0)) && visibleAngle(c, p, v2) == false && !collinear
-                && !(angle > 0 && Math.round(prev_angle) ==0);
+                && !(angle > 0 && Math.round(prev_angle) ==0)
+                && !(Math.ceil(angle) == 180 && prev_angle < 0);
         boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
                 && !visibleAngle(c, p, v2) && !collinear)
                 || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
@@ -193,7 +194,7 @@ public class VisPolygon extends Polygon {
 
         while (lineLineSegIntersection(p, c, P.peek(), get_second_peek(P)) == false) {
             while (angle_sum_exceeded()) {
-                if (P.size() == 2) {
+                if (P.size() == 1) {
                     break;
                 }
                 GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
@@ -271,8 +272,12 @@ public class VisPolygon extends Polygon {
                     P.push(R.pop());
                     System.out.println("r pushing on P bakc again");
                 }
+                System.out.println("r.size: "+ R.size());
                 System.out.println("P pop on S pushed back again");
-                S.push(P.pop());
+                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.DARKVIOLET);
+                delete_covered_points(P,S,p,P.peek());
+//                S.push(P.pop());
+                //                delete_covered_points(P,S,p,P.peek());
                 inner_turn_before = false;
             }
         } else {
@@ -739,18 +744,18 @@ public class VisPolygon extends Polygon {
 
 
 
-    public Point popLinkedChain(Stack<Point> S, Point c, Point c_prev, Point link) {
+    public Point popLinkedChain(Stack<Point> Stack, Point c, Point c_prev, Point link) {
 
         Point linked = link;
 
-        if (S.size() <= 2) {
+        if (Stack.size() <= 1) {
             return linked;
         }
-        Point current = S.pop();
-        Point prev = S.peek();
+        Point current = Stack.pop();
+        Point prev = Stack.peek();
 
         if (current.getPointLinked() != null && AdjacentEdgesTest(c, c_prev, current, prev)) {
-//            S.push(current);
+//            Stack.push(current);
             System.out.println("+++++ linked point found");
             return current;
         } else if (current.getPointLinked() == null && !AdjacentEdgesTest(c, c_prev, current, prev)) {
@@ -758,11 +763,11 @@ public class VisPolygon extends Polygon {
             return null;
         } else if (current.getPointLinked() == null && AdjacentEdgesTest(c, c_prev, current, prev)) {
             System.out.println("+++++ going recursive ");
-            linked = popLinkedChain(S, c, c_prev, linked);
+            linked = popLinkedChain(Stack, c, c_prev, linked);
         }
 
         System.out.println("+++++ pushing points");
-        S.push(current);
+        Stack.push(current);
         return linked;
     }
 
