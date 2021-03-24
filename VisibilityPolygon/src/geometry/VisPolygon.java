@@ -142,9 +142,10 @@ public class VisPolygon extends Polygon {
         boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
                 || (prev_angle < angle && angle < 0 && Math.round(prev_angle) <= 0)
                 || (((Math.round(angle) == 180) || (Math.round(angle) == -180)) && prev_angle < 0)
+                || (angle> 0 && Math.round(prev_angle) == 0 && inner_turn_before == true)
                 || (prev_angle < 0 && angle > 0)) && visibleAngle(c, p, v2) == false && !collinear
-                && !(angle > 0 && Math.round(prev_angle) ==0)
-                && !(Math.ceil(angle) == 180 && prev_angle < 0);
+                && !(angle > 0 && Math.round(prev_angle) ==0 && inner_turn_before == false);
+//                && !(Math.ceil(angle) == 180 && prev_angle < 0);
         boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
                 && !visibleAngle(c, p, v2) && !collinear)
                 || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
@@ -267,18 +268,23 @@ public class VisPolygon extends Polygon {
                 vi_prev = P.pop();
                 S.push(intersect_v);
             } else {
-                while (R.size() != 0 && R.peek() != c_prev) {
+                //&& R.peek() != c_prev
+                while (R.size() != 0 ) {
                     GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(R.peek())).setFill(Color.DARKTURQUOISE);
                     P.push(R.pop());
                     System.out.println("r pushing on P bakc again");
                 }
                 System.out.println("r.size: "+ R.size());
-                System.out.println("P pop on S pushed back again");
+                System.out.println("s.ize: "+ S.size());
                 GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.DARKVIOLET);
+//                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKVIOLET);
+//                S.peek().setFill(Color.RED);
+//                GUI.pointscene.getChildren().add(S.peek());
+                S.push(c);
                 delete_covered_points(P,S,p,P.peek());
-//                S.push(P.pop());
-                //                delete_covered_points(P,S,p,P.peek());
-                inner_turn_before = false;
+
+//                S.push(c);
+                inner_turn_before = true;
             }
         } else {
             System.out.println("normal case reached");
@@ -288,7 +294,7 @@ public class VisPolygon extends Polygon {
             S.push(P.pop());
             inner_turn_before = false;
         }
-        inner_turn_before = false;
+//        inner_turn_before = false;
         reset_angle();
         R.clear();
     }
@@ -298,7 +304,7 @@ public class VisPolygon extends Polygon {
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S.peek())).setFill(Color.GRAY);
 
 
-        while ((visibleAngle(P.peek(), p, get_second_peek(S)) == false)) {
+        while ((visibleAngle(P.peek(), p, S.peek()) == false)) {
             System.out.println("In FAST FORWARD      checkangle: " + checkAngle(P.peek(), p, get_second_peek(S)));
             GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
             vi_prev = P.pop();
@@ -442,6 +448,7 @@ public class VisPolygon extends Polygon {
             while (R.size() != 0){
                 P.push(R.pop());
             }
+            inner_turn_before = false;
             System.out.println("CASTETAFUOBhdbuidgasuohpasdhioadgiohgijohagdiohasdgiohasgdhoigashogsdoha");
 //            Point corner;
 //            System.out.println("<<<<<<<<entered in delete covered of invers linkpoint>>>>>>>>>");
@@ -573,9 +580,16 @@ public class VisPolygon extends Polygon {
         System.out.println("cross_c: " + cross_c);
         System.out.println("cross_d: " + cross_d);
 
+//        System.out.println("Point: "+ A);
+//        System.out.println("Point: "+ B);
+//        System.out.println("Point: "+ C);
+//        System.out.println("Point: "+ D);
 
         //different signs mean there is an intersection
-        if ((Math.signum(cross_d) != Math.signum(cross_c) || cross_c == 0 || cross_d == 0) && !(cross_c == 0 && cross_d == 0)) {
+        boolean almost_zero = cross_c > -0.00000001 && cross_c <= 0 || cross_d > -0.00000001 && cross_d <= 0 ;
+        //cross_c == 0 || cross_d == 0
+        if ((Math.signum(cross_d) != Math.signum(cross_c) || cross_c == 0 || cross_d == 0 )
+                && !(cross_c == 0 && cross_d == 0)) {
             System.out.println("intersection of segment");
             return true;
         } else {
@@ -749,6 +763,7 @@ public class VisPolygon extends Polygon {
         Point linked = link;
 
         if (Stack.size() <= 1) {
+            System.out.println("stack empty entered");
             return linked;
         }
         Point current = Stack.pop();
@@ -817,6 +832,8 @@ public class VisPolygon extends Polygon {
 
         current = Stack.pop();
         if (P.size() == 0) {
+            System.out.println("777777777777777777777777777   last elemnt S    77777777777777777777777777777777777");
+            System.out.println(S.lastElement());
             prev = S.lastElement();
 
         } else {
