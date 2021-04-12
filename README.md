@@ -11,10 +11,12 @@ Add lib to libraries and run extra compile command:
 Install Javafx SDK: https://gluonhq.com/products/javafx/
 
 # To Do List:
-- Algorithm
-- Editor, example polygons, save or load, pre generate
+- ~~Algorithm~~
+- Editor, ~~example polygons~~, save or load, ~~pre generate~~
 - create new points on edges
-- move points
+- move points, ~~move point of visibility~~
 - move all Polygon edges and points
+- make a visibility "map" that paints the polygon according to the area of its visibility Polygon
+- make it possible to have more points of visibility p with more visibility polygons
 
 
