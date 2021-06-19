@@ -12,9 +12,9 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
 
         System.out.println("Mouse X: "+ mouseEvent.getSceneX());
         System.out.println("Mouse Y: "+ mouseEvent.getSceneY()+ " \n");
-        if (GUI.polygon.getPolygonDrawn() && !GUI.polygon.is_p_set() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
+        if (GUI.polygon.getPolygonDrawn() && !GUI.polygon.is_q_set() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
             // Polygon drawn, draw Point from which visibility is to be calculated from
-            GUI.polygon.set_p(mouseEvent.getSceneX(), mouseEvent.getSceneY());
+            GUI.polygon.set_q(mouseEvent.getSceneX(), mouseEvent.getSceneY());
         }
 
         if (!GUI.polygon.getPolygonDrawn() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
@@ -22,9 +22,9 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
             GUI.polygon.addNode(mouseEvent.getSceneX(), mouseEvent.getSceneY());
         }
 
-        if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_p_set()
+        if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_q_set()
                 && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
-            if ( GUI.polygon.inRange(GUI.polygon.createNode(mouseEvent.getSceneX(), mouseEvent.getSceneY()),GUI.polygon.get_p()) <15){
+            if ( GUI.polygon.inRange(GUI.polygon.createNode(mouseEvent.getSceneX(), mouseEvent.getSceneY()),GUI.polygon.get_q()) <15){
                 clicks++;
                 if (clicks >= 2){
                     p_moving = !p_moving;

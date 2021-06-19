@@ -17,7 +17,7 @@ import javafx.scene.text.FontWeight;
 public class Settings {
 
 
-    private CheckBox vis_p_status = new CheckBox();
+    private CheckBox vis_q_status = new CheckBox();
 
     // ================================================================================================
     // gridpane
@@ -79,8 +79,8 @@ public class Settings {
             @Override
             public void handle(ActionEvent actionEvent) {
                 GUI.polygon.deletePolygon();
-                if(GUI.vis_p!= null) { GUI.vis_p.deleteVisPolygon();}
-                vis_p_status.setSelected(false);
+                if(GUI.vis_q!= null) { GUI.vis_q.deleteVisPolygon();}
+                vis_q_status.setSelected(false);
             }
         });
         addButton("Point Nodes", delnode);
@@ -100,14 +100,14 @@ public class Settings {
 
 
 
-        addCheckBox("VisibilityPolygon", vis_p_status);
-        vis_p_status.selectedProperty().addListener(new ChangeListener<Boolean>() {
+        addCheckBox("VisibilityPolygon", vis_q_status);
+        vis_q_status.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (vis_p_status.isSelected()) {
-                    GUI.vis_p = new VisPolygon();
+                if (vis_q_status.isSelected()) {
+                    GUI.vis_q = new VisPolygon();
                 } else {
-                    GUI.vis_p = null;
+                    GUI.vis_q = null;
                     geometry.EventHandler.clicks = 0;
                     geometry.EventHandler.p_moving = false;
                     GUI.polygonscene.getChildren().clear();
@@ -117,6 +117,25 @@ public class Settings {
 
 
         Slider beta = new Slider(0, 720, 0);
+        beta.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                if (beta.getValue() == 0){
+                    GUI.betavis_q.deletePolygon();
+                    System.out.println("deleted");
+                } else if ( GUI.betavis_q!=null){
+                    System.out.println("betavisq != null");
+                    GUI.betavis_q.deletePolygon();
+                    GUI.betavis_q = new BetaVis(beta.getValue());
+                } else if (GUI.betavis_q == null) {
+                    System.out.println("betavisq == null");
+                    GUI.betavis_q = new BetaVis(beta.getValue());
+                }
+
+            }
+        });
+
+        //GUI.betavis_q.setBeta_global(beta.getValue());
 
         beta.setShowTickLabels(true);
         beta.setShowTickMarks(true);
@@ -124,8 +143,8 @@ public class Settings {
         beta.setMinorTickCount(45);
         addNumberSlider("Beta-Erweiterung", 0, beta);
 
-        CheckBox realtime = new CheckBox();
-        addCheckBox("Real Time Update", realtime);
+//        CheckBox realtime = new CheckBox();
+//        addCheckBox("Real Time Update", realtime);
 
 
         // Polygon Drawer
@@ -251,8 +270,8 @@ public class Settings {
     // Getters and Setters
     // ------------------------------------------------------------------------------------------------
 
-    public CheckBox get_vis_p_Status() {
-        return vis_p_status;
+    public CheckBox get_vis_q_Status() {
+        return vis_q_status;
     }
 
 

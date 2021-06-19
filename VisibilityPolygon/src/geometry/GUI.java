@@ -15,11 +15,13 @@ public class GUI extends Application {
 
     //global Variables
     public static Polygon polygon = new Polygon();
-    public static VisPolygon vis_p;
+    public static VisPolygon vis_q;
+    public static BetaVis betavis_q = null;
     public static Stage primary;
     public static Group pointscene = new Group();
     public static Group edgescene = new Group();
     public static Group polygonscene = new Group();
+    public static Group betapolygonscene = new Group();
 
 
     public void start(Stage primaryStage) throws Exception {
@@ -67,6 +69,9 @@ public class GUI extends Application {
         this.edgescene.toBack();
         settinglayer.getChildren().add(this.polygonscene);
         this.polygonscene.toFront();
+        settinglayer.getChildren().add(this.betapolygonscene);
+        this.betapolygonscene.toFront();
+
 
 
 

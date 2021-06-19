@@ -1,24 +1,20 @@
 package geometry;
 
 
-import java.awt.*;
 import java.awt.geom.Line2D;
-
-import com.sun.javafx.geom.Edge;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-
 import java.util.ArrayList;
-import java.util.Stack;
+
 
 public class Polygon {
 
     private ArrayList<Point> PointList = new ArrayList<>(50);
     private ArrayList<Line> EdgeList = new ArrayList<>(50);
-    private Point p = null;
+    private Point q = null;
     private boolean isPolygonDrawn = false;
-    private boolean is_p_set = false;
+    private boolean is_q_set = false;
+
 
 
     public void addNode(double x, double y) {
@@ -104,11 +100,11 @@ public class Polygon {
         return true;
     }
 
-    public boolean p_in_Polygon(Point p) {
+    public boolean q_in_Polygon(Point q) {
 
         double total_angle = 0;
         for (int i = 0; i < EdgeList.size(); i++) {
-            total_angle += checkAngle(PointList.get(i), p, PointList.get(incrementIdx(i)));
+            total_angle += checkAngle(PointList.get(i), q, PointList.get(incrementIdx(i)));
         }
         if (Math.round(total_angle) != 0) {
             return true;
@@ -128,8 +124,8 @@ public class Polygon {
         this.PointList.clear();
         GUI.pointscene.getChildren().clear();
         GUI.edgescene.getChildren().clear();
-        p = null;
-        this.is_p_set = false;
+        q = null;
+        this.is_q_set = false;
         this.isPolygonDrawn = false;
     }
 
@@ -177,8 +173,8 @@ public class Polygon {
         return this.isPolygonDrawn;
     }
 
-    public boolean is_p_set() {
-        return this.is_p_set;
+    public boolean is_q_set() {
+        return this.is_q_set;
     }
 
     public void setPointList(ArrayList<Point> pointList) {
@@ -190,34 +186,34 @@ public class Polygon {
     }
 
 
-    public Point get_p() {
-        return this.p;
+    public Point get_q() {
+        return this.q;
     }
 
-    public void move_p(double x, double y) {
-        if (p_in_Polygon(p)) {
-            this.p.setCenterX(x);
-            this.p.setCenterY(y);
+    public void move_q(double x, double y) {
+        if (q_in_Polygon(q)) {
+            this.q.setCenterX(x);
+            this.q.setCenterY(y);
         } else {
             System.out.println("Out of Bounds, deleting p. \n Set a new p");
-            p = null;
-            this.is_p_set = false;
+            q = null;
+            this.is_q_set = false;
             GUI.pointscene.getChildren().remove(GUI.pointscene.getChildren().size() - 1);
             EventHandler.p_moving = false;
             EventHandler.clicks = 0;
         }
     }
 
-    public void set_p(double x, double y) {
-        this.p = createNode(x, y);
-        this.p.setStroke(Color.DARKRED);
-        this.p.setFill(Color.DARKRED);
-        if (p_in_Polygon(p)) {
-            this.is_p_set = true;
-            GUI.pointscene.getChildren().add(p);
-            System.out.println("p in polygon");
+    public void set_q(double x, double y) {
+        this.q = createNode(x, y);
+        this.q.setStroke(Color.DARKRED);
+        this.q.setFill(Color.DARKRED);
+        if (q_in_Polygon(q)) {
+            this.is_q_set = true;
+            GUI.pointscene.getChildren().add(q);
+            System.out.println("q in polygon");
         } else {
-            System.out.println("p not in polygon, set another p");
+            System.out.println("q not in polygon, set another q");
         }
 
     }
