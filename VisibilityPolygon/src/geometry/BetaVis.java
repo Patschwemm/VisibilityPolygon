@@ -31,6 +31,12 @@ public class BetaVis extends VisPolygon {
             // copy array so we have it for several BetaVisibility runs
             Stack<Point> P_temp = (Stack<Point>) this.P.clone();
             Stack<Point> Vis_temp = (Stack<Point>) this.Vis.clone();
+            P_temp=invertStack(P_temp);
+            Vis_temp=invertStack(Vis_temp);
+            printStackorder(P_temp);
+            printStackorder(Vis_temp);
+
+
 
             System.out.println("P:" + P_temp);
             System.out.println("Vis:" + Vis_temp);
@@ -592,6 +598,27 @@ public class BetaVis extends VisPolygon {
     // Structure -, Variable Handling
     // ----------------------------------------------------------------------------------------------------------------
 
+    protected void printStackorder(Stack<Point> Stack) {
+
+
+        for (int i = 0; i < Stack.size(); i++) {
+            System.out.println("number: "+ i + Stack.pop());
+        }
+    }
+
+    protected Stack<Point> invertStack(Stack<Point> Stack){
+        Stack<Point> temp =  new Stack<>();
+
+        for (int i=0; i< Stack.size(); i++){
+            temp.push(Stack.pop());
+        }
+
+        for (int i=0; i< temp.size(); i++){
+            Stack.push(temp.pop());
+        }
+
+        return Stack;
+    }
 
     @Override
     protected void connectEdges(Stack<Point> Vis) {
@@ -613,14 +640,6 @@ public class BetaVis extends VisPolygon {
         GUI.betapolygonscene.getChildren().add(beta_vis_polygon);
     }
 
-
-    public void Copy_P(Point v) {
-        P.push(v);
-    }
-
-    public void Copy_Vis(Point v) {
-        Vis.push(v);
-    }
 
 
     //clears VisPolygon
