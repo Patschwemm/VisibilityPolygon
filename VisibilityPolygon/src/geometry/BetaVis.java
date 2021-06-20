@@ -1,10 +1,7 @@
 package geometry;
 
-import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 public class BetaVis extends VisPolygon {
@@ -105,20 +102,20 @@ public class BetaVis extends VisPolygon {
         }
         if (B_vis.peek().isCorner() == true) {
             System.out.println("--------------------------------------------------------------------------------");
-            System.out.println("Right Chamber");
+            System.out.println("Right Cave");
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("V.size:"+ Vis_temp.size());
             System.out.println("P.size:"+ P_temp.size());
             System.out.println("Bvis.size:"+ B_vis.size());
-            RightChamber(P_temp, B_vis, Vis_temp, beta);
+            Rightcave(P_temp, B_vis, Vis_temp, beta);
         } else if (B_vis.peek().isCorner() == false) {
-            LeftChamber(P_temp, B_vis, Vis_temp, beta);
+            LeftCave(P_temp, B_vis, Vis_temp, beta);
         }
         B_vis.push(Vis_temp.pop());
     }
 
 
-    public boolean RightChamber(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
+    public boolean Rightcave(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
 
         Point c_outerturn = B_vis.peek();
 
@@ -150,7 +147,7 @@ public class BetaVis extends VisPolygon {
     }
 
 
-    public void LeftChamber(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
+    public void LeftCave(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
 
     }
 
