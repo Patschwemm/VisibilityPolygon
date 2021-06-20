@@ -17,31 +17,35 @@ public class BetaVis extends VisPolygon {
 
 
     public BetaVis(double beta) {
-        super();
         //check if Vis Polygon is computed
         if (GUI.vis_q != null) {
 
-            System.out.println("beta: " + beta);
+            System.out.println("--------------------------------------------------------------------------------");
+            System.out.println("BETA: "+ beta);
+            System.out.println("--------------------------------------------------------------------------------");
             // preprocessing
             // ----------------------------------------
 
 
-            System.out.println("P:" + P);
-            System.out.println("Vis:" + Vis);
+            System.out.println("P in beta:" + P.size());
+            System.out.println("Vis in beta:" + Vis.size());
             // copy array so we have it for several BetaVisibility runs
             Stack<Point> P_temp = (Stack<Point>) this.P.clone();
             Stack<Point> Vis_temp = (Stack<Point>) this.Vis.clone();
-            P_temp=invertStack(P_temp);
-            Vis_temp=invertStack(Vis_temp);
-            printStackorder(P_temp);
-            printStackorder(Vis_temp);
+            System.out.println("P_temp in beta:" + P_temp.size());
+            System.out.println("Vis_temp in beta:" + Vis_temp.size());
 
+            //pre processing of Stack P
+            P_temp = reorderP_temp(P_temp);
+            System.out.println(P_temp.peek());
+            System.out.println(Vis_temp.peek());
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(Vis_temp.peek())).setFill(Color.WHITE);
+            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P_temp.peek())).setFill(Color.WHITE);
 
-
-            System.out.println("P:" + P_temp);
-            System.out.println("Vis:" + Vis_temp);
-            System.out.println("V_temp.size:"+ Vis_temp.size());
             System.out.println("P_temp.size:"+ P_temp.size());
+            System.out.println("V_temp.size:"+ Vis_temp.size());
+
+
 
             // calculate visibility
             // ----------------------------------------
@@ -53,19 +57,28 @@ public class BetaVis extends VisPolygon {
     }
 
     private void beta_visibility(Stack<Point> P_temp, Stack<Point> Vis_temp, double beta) {
-        Point v_start = P_temp.peek();
+//        Point v_start = Vis_temp.peek();
+
+        //start condition, push the two visible starting points
         B_vis.push(P_temp.pop());
-        System.out.println("B.peek point "+ B_vis.peek());
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.GREEN);
         B_vis.push(P_temp.pop());
-        System.out.println("B.peek point "+ B_vis.peek());
-
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.GREEN);
         Vis_temp.pop();
         Vis_temp.pop();
 
 
-        while (P_temp.peek() != v_start) {
+
+        System.out.println(P_temp.peek());
+        System.out.println(Vis_temp.peek());
+        System.out.println(P.firstElement());
+
+        System.out.println("V.size:"+ Vis_temp.size());
+        System.out.println("P.size:"+ P_temp.size());
+        System.out.println("Bvis.size:"+ B_vis.size());
+
+
+        while (P_temp.size() != 0) {
             PolygonCycle(P_temp, Vis_temp, beta);
         }
         connectEdges(B_vis);
@@ -78,7 +91,7 @@ public class BetaVis extends VisPolygon {
     private void PolygonCycle(Stack<Point> P_temp, Stack<Point> Vis_temp, double beta) {
 
 
-        while (P_temp.peek() == Vis_temp.peek()) {
+        while (P_temp.size() != 0 && Vis_temp.size() !=0 && P_temp.peek() == Vis_temp.peek() ) {
             B_vis.push(P_temp.pop());
             Vis_temp.pop();
             System.out.println("--------------------------------------------------------------------------------");
@@ -86,9 +99,17 @@ public class BetaVis extends VisPolygon {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("V.size:"+ Vis_temp.size());
             System.out.println("P.size:"+ P_temp.size());
+            System.out.println("Bvis.size:"+ B_vis.size());
+
 
         }
         if (B_vis.peek().isCorner() == true) {
+            System.out.println("--------------------------------------------------------------------------------");
+            System.out.println("Right Chamber");
+            System.out.println("--------------------------------------------------------------------------------");
+            System.out.println("V.size:"+ Vis_temp.size());
+            System.out.println("P.size:"+ P_temp.size());
+            System.out.println("Bvis.size:"+ B_vis.size());
             RightChamber(P_temp, B_vis, Vis_temp, beta);
         } else if (B_vis.peek().isCorner() == false) {
             LeftChamber(P_temp, B_vis, Vis_temp, beta);
@@ -97,26 +118,34 @@ public class BetaVis extends VisPolygon {
     }
 
 
-    public void RightChamber(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
+    public boolean RightChamber(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta) {
 
         Point c_outerturn = B_vis.peek();
-        double alpha_init = checkAngle(get_second_peek(Vis_temp), c_outerturn, P_temp.peek());
+
+        System.out.println("V.size:"+ Vis_temp.size());
+        System.out.println("P.size:"+ P_temp.size());
+        System.out.println("Bvis.size:"+ B_vis.size());
+
+        double alpha_init = checkAngle(P_temp.peek(), c_outerturn, get_second_peek(Vis_temp));
         c_outerturn.setSuccessor(get_second_peek(B_vis));
         c_outerturn.setPredecessor(P_temp.peek());
 
 
-        if (alpha_init > beta) {
-            forwardIntersect(P_temp, B_vis, rotatePredeccPointClockwise(beta, c_outerturn), c_outerturn);
-            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, Vis_temp.peek(), get_second_peek(Vis_temp));
-        } else if (alpha_init <= beta) {
-            B_vis.push(P_temp.pop());
-            //B_vis.peek().setLinkedtocorner(c_outerturn);
-            B_vis.peek().setTreeParent(c_outerturn);
-            c_outerturn.setTreeChild(B_vis.peek());
-            beta = beta - alpha_init;
-            c_outerturn.setLocalBeta(beta);
-            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, Vis_temp.peek(), get_second_peek(Vis_temp));
-        }
+        System.out.println("alpha : "+ alpha_init + "Beta: "+ beta);
+        return false;
+
+//        if (alpha_init > beta) {
+//            forwardIntersect(P_temp, B_vis, rotatePredeccPointClockwise(beta, c_outerturn), c_outerturn);
+//            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, Vis_temp.peek(), get_second_peek(Vis_temp));
+//        } else if (alpha_init <= beta) {
+//            B_vis.push(P_temp.pop());
+//            //B_vis.peek().setLinkedtocorner(c_outerturn);
+//            B_vis.peek().setTreeParent(c_outerturn);
+//            c_outerturn.setTreeChild(B_vis.peek());
+//            beta = beta - alpha_init;
+//            c_outerturn.setLocalBeta(beta);
+//            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, Vis_temp.peek(), get_second_peek(Vis_temp));
+//        }
 
     }
 
@@ -598,37 +627,62 @@ public class BetaVis extends VisPolygon {
     // Structure -, Variable Handling
     // ----------------------------------------------------------------------------------------------------------------
 
-    protected void printStackorder(Stack<Point> Stack) {
+    public void printStackorder(Stack<Point> Stack) {
 
 
-        for (int i = 0; i < Stack.size(); i++) {
+        int size = Stack.size();
+        for (int i = 0; i < size; i++) {
             System.out.println("number: "+ i + Stack.pop());
         }
     }
 
-    protected Stack<Point> invertStack(Stack<Point> Stack){
-        Stack<Point> temp =  new Stack<>();
+    protected Stack<Point> reorderP_temp(Stack<Point> Stack){
+        Stack<Point> temp1 =  new Stack<>();
+        Stack<Point> temp2 =  new Stack<>();
 
-        for (int i=0; i< Stack.size(); i++){
-            temp.push(Stack.pop());
+        int size = Stack.size();
+        for (int i=2; i< size; i++){
+            temp1.push(Stack.pop());
         }
 
-        for (int i=0; i< temp.size(); i++){
-            Stack.push(temp.pop());
+        for (int i=0; i< size-2; i++){
+            temp2.push(temp1.pop());
         }
+        temp2.push(Stack.pop());
+        temp2.push(Stack.pop());
 
-        return Stack;
+
+        return temp2;
     }
 
     @Override
-    protected void connectEdges(Stack<Point> Vis) {
+    protected Point get_second_peek(Stack<Point> Stack) {
+        Point prev;
+        Point current;
+
+
+        current = Stack.pop();
+        if (P.size() == 0) {
+            System.out.println("777777777777777777777777777   last elemnt S    77777777777777777777777777777777777");
+            System.out.println(Vis.lastElement());
+            prev = Vis.lastElement();
+
+        } else {
+            prev = Stack.peek();
+        }
+        Stack.push(current);
+        return prev;
+    }
+
+    @Override
+    protected void connectEdges(Stack<Point> B_vis) {
 
         javafx.scene.shape.Polygon beta_vis_polygon = new javafx.scene.shape.Polygon();
 
 
-        int stack_size = Vis.size();
+        int stack_size = B_vis.size();
         for (int i = 0; i < stack_size; i++) {
-            beta_vis_polygon.getPoints().addAll(Vis.peek().getCenterX(), Vis.pop().getCenterY());
+            beta_vis_polygon.getPoints().addAll(B_vis.peek().getCenterX(), B_vis.pop().getCenterY());
         }
 
         beta_vis_polygon.setStroke(Color.GOLD.darker());

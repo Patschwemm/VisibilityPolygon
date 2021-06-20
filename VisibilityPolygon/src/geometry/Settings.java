@@ -119,19 +119,27 @@ public class Settings {
         Slider beta = new Slider(0, 720, 0);
         beta.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                if (beta.getValue() == 0){
-                    GUI.betavis_q.deletePolygon();
-                    System.out.println("deleted");
-                } else if ( GUI.betavis_q!=null){
-                    System.out.println("betavisq != null");
-                    GUI.betavis_q.deletePolygon();
-                    GUI.betavis_q = new BetaVis(beta.getValue());
-                } else if (GUI.betavis_q == null) {
-                    System.out.println("betavisq == null");
-                    GUI.betavis_q = new BetaVis(beta.getValue());
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldvalue, Number newvalue) {
+                System.out.println("oldvalue:"+ oldvalue);
+                System.out.println("newvalue:"+ newvalue);
+                if(GUI.vis_q != null){
+                    if (newvalue.intValue() == 0){
+                        VisPolygon.betavis = false;
+                        System.out.println("newvalue = 0.0, deleted");
+                        GUI.betavis_q.deletePolygon();
+                    } else if (oldvalue.intValue() == 0 && newvalue.intValue()!= 0){
+                        VisPolygon.betavis = true;
+                        System.out.println("initial new polygon ");
+                        GUI.betavis_q = new BetaVis(beta.getValue());
+                    } else{
+                        VisPolygon.betavis = true;
+                        System.out.println("deleted and created");
+                        GUI.betavis_q.deletePolygon();
+                        GUI.betavis_q = new BetaVis(beta.getValue());
+                    }
+                }else {
+                    System.out.println("Input Visibility Polygon and necessities");
                 }
-
             }
         });
 
@@ -172,7 +180,18 @@ public class Settings {
                 drawer.draw_S_polygon();
             }
         });
-        addButton("S polygon", draw_s);
+        addButton("S-Polygon", draw_s);
+
+        Button draw_c = new Button("Draw");
+        draw_c.setFont(font);
+        draw_c.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_C_Polygon();
+            }
+        });
+        addButton("C-polygon", draw_c);
+
 
         return gp;
     }
@@ -275,11 +294,11 @@ public class Settings {
     }
 
 
-
-
     public final int getSettingsWidth() {
         return this.toolbarWidth;
     }
+
+
 
 }
 

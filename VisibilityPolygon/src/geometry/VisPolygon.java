@@ -17,20 +17,20 @@ public class VisPolygon extends Polygon {
     //List Copies of P and Vis for BetaVis
     private Stack<Point> betavis_P = new Stack<Point>();
     private Stack<Point> betavis_Vis = new Stack<Point>();
-    // List with Elements that belong to visibility polygon
-    private ArrayList<Point> VisPointList = new ArrayList<>(PointList.size());
-//    private ArrayList<Line> VisEdgeList = new ArrayList<>(PointList.size());
     private double angle_sum = 0;
     private int p_idx;
     private Point vi_prev;
     public boolean inner_turn_before = false;
+    public static boolean betavis = false;
 
 
 
-    public VisPolygon() {
+    protected VisPolygon() {
         super();
+
         //check if Polygon is given and p point for visibility is given
-        if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_q_set()) {
+        System.out.println("precondition" + GUI.betavis_q);
+        if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_q_set() && betavis == false) {
 
             // preprocessing
             // ----------------------------------------
@@ -43,7 +43,9 @@ public class VisPolygon extends Polygon {
             algorithm_default(P, Vis, GUI.polygon.get_q());
             showPushedNodes();
 
-        } else {
+        } else if(betavis == true){
+            System.out.println("not called because betavis is called");
+        } else{
             System.out.println("Input of Polygon and visibility Point p needed. \n");
             Settings.get().get_vis_q_Status().setSelected(false);
         }
@@ -56,16 +58,14 @@ public class VisPolygon extends Polygon {
     private void algorithm_default(Stack<Point> P, Stack<Point> Vis, Point p) {
 
         // calculate visible starting point (done in Pre-Processing)
-        // ArrayList with visible point of polygon edge
 
-        Point start = Vis.lastElement();
 
         vi_prev = get_second_peek(Vis);
         //cycles through all nodes of polygon
         while (!(P.size() <= 1)) {
             boundaryCycle(P, Vis, p);
             System.out.println("P size: " + P.size());
-            System.out.println("S size: " + Vis.size());
+            System.out.println("Vis size: " + Vis.size());
         }
 
         //connects all nodes of Polygon and makes visibilityPolygon visible on Interface
@@ -82,7 +82,7 @@ public class VisPolygon extends Polygon {
 
             System.out.println("boundary cycling");
             System.out.println("P size: " + P.size());
-            System.out.println("S size: " + Vis.size());
+            System.out.println("Vis size: " + Vis.size());
             System.out.println("visible angle: " + visibleAngle(Vis.peek(), p, P.peek()));
 
             vi_prev = Vis.peek();
@@ -96,7 +96,7 @@ public class VisPolygon extends Polygon {
                 Vis.pop();
                 break;
             }
-            System.out.println("Event: " + getEvent(Vis.peek(), p, P.peek(), get_second_peek(Vis), P, Vis));
+//            System.out.println("Event: " + getEvent(Vis.peek(), p, P.peek(), get_second_peek(Vis), P, Vis));
         }
     }
 
@@ -760,8 +760,6 @@ public class VisPolygon extends Polygon {
 
     //clears VisPolygon
     public void deleteVisPolygon() {
-        VisPointList.clear();
-//        VisEdgeList.clear();
         GUI.polygonscene.getChildren().clear();
     }
 
@@ -782,6 +780,9 @@ public class VisPolygon extends Polygon {
             betavis_P.push(List.get(p_idx));
             p_idx = incrementIdx(p_idx);
         }
+        System.out.println(betavis_P);
+        System.out.println(P);
+
     }
 
     public void showPushedNodes(){
