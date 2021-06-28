@@ -79,6 +79,18 @@ public class Polygon {
         return edge;
     }
 
+    public Line createEdgeFromPoints(Point v, Point w){
+        Line edge = createEdge(v.getCenterX(),v.getCenterY(),w.getCenterX(),w.getCenterY());
+                edge.setStroke(Color.YELLOW);
+        return edge;
+    }
+
+    public Line createEdgeFromPointsBlue(Point v, Point w){
+        Line edge = createEdge(v.getCenterX(),v.getCenterY(),w.getCenterX(),w.getCenterY());
+        edge.setStroke(Color.AQUAMARINE);
+        return edge;
+    }
+
     public boolean checkPolygonIntersection(Line edge, boolean connector) {
 
         double x1 = edge.getStartX();

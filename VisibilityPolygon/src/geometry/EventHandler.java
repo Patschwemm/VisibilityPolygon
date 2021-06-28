@@ -10,8 +10,8 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent mouseEvent) {
 
-        System.out.println("Mouse X: "+ mouseEvent.getSceneX());
-        System.out.println("Mouse Y: "+ mouseEvent.getSceneY()+ " \n");
+        System.out.println("GUI.polygon.addNode("+mouseEvent.getSceneX()+","+mouseEvent.getSceneY()+");");
+
         if (GUI.polygon.getPolygonDrawn() && !GUI.polygon.is_q_set() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
             // Polygon drawn, draw Point from which visibility is to be calculated from
             GUI.polygon.set_q(mouseEvent.getSceneX(), mouseEvent.getSceneY());

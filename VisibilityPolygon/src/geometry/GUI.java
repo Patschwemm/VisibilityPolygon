@@ -70,7 +70,7 @@ public class GUI extends Application {
         settinglayer.getChildren().add(this.polygonscene);
         this.polygonscene.toFront();
         settinglayer.getChildren().add(this.betapolygonscene);
-        this.betapolygonscene.toFront();
+        this.betapolygonscene.toBack();
 
 
 

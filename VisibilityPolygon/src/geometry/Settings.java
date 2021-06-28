@@ -18,6 +18,7 @@ public class Settings {
 
 
     private CheckBox vis_q_status = new CheckBox();
+    private Slider beta = new Slider(0, 720, 0);
 
     // ================================================================================================
     // gridpane
@@ -63,8 +64,9 @@ public class Settings {
 
         // add components for settings to gridpane
 
+        // ----------------------------------------------------------------------------------------------------------
         // Points Options
-        // -------------------------------------
+        // ----------------------------------------------------------------------------------------------------------
         addSeparator("Point Options");
 
         Button drawpoly = new Button("Connect");
@@ -81,20 +83,24 @@ public class Settings {
                 GUI.polygon.deletePolygon();
                 if(GUI.vis_q!= null) { GUI.vis_q.deleteVisPolygon();}
                 vis_q_status.setSelected(false);
+                if(GUI.vis_q.betavis == true){
+                    GUI.betavis_q.deleteBetaVisPolygon();
+                    GUI.vis_q.betavis = false;
+                    beta.valueProperty().setValue(0);
+                }
             }
         });
         addButton("Point Nodes", delnode);
 
 
-        CheckBox caption = new CheckBox();
-        addCheckBox("Node Caption", caption);
-
 
         CheckBox hidenode = new CheckBox();
         addCheckBox("Hide Node", hidenode);
 
+        // ----------------------------------------------------------------------------------------------------------
         // Polygon Options
-        // -------------------------------------
+        // ----------------------------------------------------------------------------------------------------------
+
         addSeparator("Polygon Options");
 
 
@@ -116,7 +122,6 @@ public class Settings {
         });
 
 
-        Slider beta = new Slider(0, 720, 0);
         beta.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldvalue, Number newvalue) {
@@ -126,7 +131,7 @@ public class Settings {
                     if (newvalue.intValue() == 0){
                         VisPolygon.betavis = false;
                         System.out.println("newvalue = 0.0, deleted");
-                        GUI.betavis_q.deletePolygon();
+                        GUI.betavis_q.deleteBetaVisPolygon();
                     } else if (oldvalue.intValue() == 0 && newvalue.intValue()!= 0){
                         VisPolygon.betavis = true;
                         System.out.println("initial new polygon ");
@@ -134,7 +139,7 @@ public class Settings {
                     } else{
                         VisPolygon.betavis = true;
                         System.out.println("deleted and created");
-                        GUI.betavis_q.deletePolygon();
+                        GUI.betavis_q.deleteBetaVisPolygon();
                         GUI.betavis_q = new BetaVis(beta.getValue());
                     }
                 }else {
@@ -154,9 +159,10 @@ public class Settings {
 //        CheckBox realtime = new CheckBox();
 //        addCheckBox("Real Time Update", realtime);
 
-
+        // ----------------------------------------------------------------------------------------------------------
         // Polygon Drawer
-        // -------------------------------------
+        // ----------------------------------------------------------------------------------------------------------
+
         addSeparator("Polygon Drawer");
 
         PolygonDrawer drawer = new PolygonDrawer();
@@ -192,6 +198,45 @@ public class Settings {
         });
         addButton("C-polygon", draw_c);
 
+        Button draw_right_cave = new Button("Draw");
+        draw_right_cave.setFont(font);
+        draw_right_cave.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_generic_right_cave();
+            }
+        });
+        addButton("Generic Right Cave", draw_right_cave);
+
+        Button draw_reverse_s_polygon = new Button("Draw");
+        draw_reverse_s_polygon.setFont(font);
+        draw_reverse_s_polygon.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_reverse_S_Polygon();
+            }
+        });
+        addButton("Reverse S Polygon", draw_reverse_s_polygon);
+
+        Button draw_z_poly = new Button("Draw");
+        draw_z_poly.setFont(font);
+        draw_z_poly.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_z_polygon();
+            }
+        });
+        addButton("Z Polygon", draw_z_poly);
+
+        Button draw_right_corridor_cave = new Button("Draw");
+        draw_right_corridor_cave.setFont(font);
+        draw_right_corridor_cave.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_right_corridor_caves();
+            }
+        });
+        addButton("Right Corridor Caves", draw_right_corridor_cave);
 
         return gp;
     }

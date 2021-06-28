@@ -38,6 +38,7 @@ public class VisPolygon extends Polygon {
             pre_Processing_P(PointList, GUI.polygon.get_q());
             List_to_Stack(PointList, P, p_idx);
 
+
             // calculate visibility
             // ----------------------------------------
             algorithm_default(P, Vis, GUI.polygon.get_q());
@@ -326,7 +327,7 @@ public class VisPolygon extends Polygon {
         } else {
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(Vis.peek())).setFill(Color.DARKCYAN);
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S_prev)).setFill(Color.DARKCYAN);
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
 
             //line intersection of 4 points (2 node for first edge, 2 for second edge)
             intersect_v = lineLineIntersection(q, c, Vis.peek(), get_second_peek(Vis));
@@ -335,9 +336,10 @@ public class VisPolygon extends Polygon {
 
 
             Vis.push(intersect_v);
+//            GUI.betapolygonscene.getChildren().add(createNode(intersect_v.getCenterX(),intersect_v.getCenterY()));
             Vis.push(P.pop());
 
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
 
             System.out.println("intersection created");
             inner_turn_before = true;
@@ -645,7 +647,7 @@ public class VisPolygon extends Polygon {
         if (angle_sum >= 0) {
             angle_sum = 0;
         }
-        System.out.println("angle sum: " + angle_sum);
+//        System.out.println("angle sum: " + angle_sum);
     }
 
     // orientation test addition to angle sum
@@ -801,9 +803,8 @@ public class VisPolygon extends Polygon {
 
         int stack_size = Vis.size();
         for (int i = 0; i < stack_size; i++) {
-            if(GUI.betavis_q == null){
-                betavis_Vis.push(Vis.peek());
-            }
+
+            betavis_Vis.push(Vis.peek());
             vis_polygon.getPoints().addAll(Vis.peek().getCenterX(), Vis.pop().getCenterY());
         }
 
