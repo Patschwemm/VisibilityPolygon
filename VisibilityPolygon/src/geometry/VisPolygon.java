@@ -346,7 +346,7 @@ public class VisPolygon extends Polygon {
         }
     }
 
-    private void previousPointCovered(Stack<Point> P, Stack<Point> Vis, Point q, Point c, Point linkpoint) {
+    protected void previousPointCovered(Stack<Point> P, Stack<Point> Vis, Point q, Point c, Point linkpoint) {
         System.out.println("entered previous point covered");
         Point intersect_v;
 

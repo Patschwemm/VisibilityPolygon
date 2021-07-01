@@ -6,19 +6,28 @@ import java.util.ArrayList;
 
 public class Point extends Circle {
 
-    private Point PointLinked = null;
-    private boolean corner = false;
-    private Point Successor = null;
+    private Point pointLinked;
+    private boolean corner;
+    private Point successor;
     private double local_beta;
-    private Point Predecc = null;
-    private Point linkedtocorner = null;
-    private ArrayList<Point> Childs = new ArrayList<>();
-    private Point child = null;
-    private Point parent = null;
+    private Point predecc;
+    private Point linkedtocorner;
+    private ArrayList<Point> childs;
+    private Point child;
+    private Point parent;
 
 
-    public Point(){
+    public Point() {
         super();
+        this.pointLinked = null;
+        this.corner = false;
+        this.successor = null;
+        this.local_beta = 0;
+        this.predecc = null;
+        this.linkedtocorner = null;
+        this.childs = new ArrayList<>();
+        this.child = null;
+        this.parent = null;
     }
 
 
@@ -44,16 +53,20 @@ public class Point extends Circle {
     //getChild() & Gibt die Kindknoten aus \\
 
     public void setTreeChild(Point Child) {
-        Childs.add(Child);
+        childs.add(Child);
     }
 
     public ArrayList<Point> getTreeChild() {
-        return Childs;
+        return childs;
     }
 
-    public void setTreeParent(Point Parent){this.parent = Parent;}
+    public void setTreeParent(Point Parent) {
+        this.parent = Parent;
+    }
 
-    public Point getTreeParent(){return this.parent;}
+    public Point getTreeParent() {
+        return this.parent;
+    }
 
     public Point getLinkedtocorner() {
         return linkedtocorner;
@@ -72,43 +85,48 @@ public class Point extends Circle {
     }
 
     public void setSuccessor(Point successor) {
-        Successor = successor;
+        this.successor = successor;
     }
 
     public void setPredecessor(Point predecc) {
-        Predecc = predecc;
+        this.predecc = predecc;
     }
 
     public Point getSuccessor() {
-        return Successor;
+        return successor;
     }
 
     public Point getPredecessor() {
-        return Predecc;
+        return predecc;
     }
 
-    public void setCorner(){
-        corner = true;
+    public void clearBetaLinkage(){
+        this.successor = null;
+        this.local_beta = 0;
+        this.predecc = null;
+        this.childs.clear();
+        this.child = null;
+        this.parent = null;
     }
-
-    public boolean isCorner(){
-        return corner;
-    }
-
     // ----------------------------------------------------------------------------------------------------------------
     // for VisPolygon
     // ----------------------------------------------------------------------------------------------------------------
 
-    public Point getPointLinked(){
-        return this.PointLinked;
+    public void setCorner() {
+        corner = true;
     }
 
-    public void setPointLinked(Point Pointlinked){
-        this.PointLinked = Pointlinked;
+    public boolean isCorner() {
+        return corner;
     }
 
+    public Point getPointLinked() {
+        return this.pointLinked;
+    }
 
-
+    public void setPointLinked(Point Pointlinked) {
+        this.pointLinked = Pointlinked;
+    }
 
 
 }
