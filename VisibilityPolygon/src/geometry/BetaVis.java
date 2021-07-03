@@ -209,7 +209,8 @@ public class BetaVis extends VisPolygon {
                 B_vis.push(P_temp.pop());
                 B_vis.peek().setLinkedtocorner(c_outerturn);
                 System.out.println("beta in recvis: "+ beta);
-                if(lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == true){
+
+                if(P.size() != 0 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == true){
                     System.out.println("in IF STATEMENT");
                     if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
 
@@ -218,7 +219,7 @@ public class BetaVis extends VisPolygon {
             }
         }
         System.out.println("P_temp size in rec vis ENDING " + P_temp.size());
-        System.out.println("PTEMP REC ENDING POINT : "+ P_temp.peek());
+//        System.out.println("PTEMP REC ENDING POINT : "+ P_temp.peek());
 //        printStackorder(P_temp);
 //        if(P_temp.size() != 0){
 //            B_vis.push(P_temp.pop());
