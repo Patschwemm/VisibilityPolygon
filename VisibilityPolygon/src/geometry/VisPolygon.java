@@ -17,7 +17,7 @@ public class VisPolygon extends Polygon {
     //List Copies of P and Vis for BetaVis
     private Stack<Point> betavis_P = new Stack<Point>();
     private Stack<Point> betavis_Vis = new Stack<Point>();
-    private double angle_sum = 0;
+    protected double angle_sum = 0;
     private int p_idx;
     private Point vi_prev;
     public boolean inner_turn_before = false;

@@ -11,7 +11,6 @@ public class BetaVis extends VisPolygon {
     private final Stack<Point> Vis = GUI.vis_q.getBetavis_Vis();
     private final Stack<Point> B_vis = new Stack<Point>();
     private final ArrayList<Point> rec_c_points = new ArrayList<>();
-    private final double angle_sum = 0;
     private Point vi_prev;
 
 
@@ -19,6 +18,7 @@ public class BetaVis extends VisPolygon {
         //check if Vis Polygon is computed
         if (GUI.vis_q != null) {
 
+            reset_angle();
             System.out.println();
             System.out.println();
             System.out.println();
@@ -100,15 +100,12 @@ public class BetaVis extends VisPolygon {
         while (P_temp.size() != 1 && Vis_temp.size() != 0 && P_temp.peek() == Vis_temp.peek()) {
             B_vis.push(P_temp.pop());
             Vis_temp.pop();
-            System.out.println("--------------------------------------------------------------------------------");
             System.out.println("Point ADDED BETA VIS");
-            System.out.println("--------------------------------------------------------------------------------");
             System.out.println("V.size:" + Vis_temp.size());
             System.out.println("P.size:" + P_temp.size());
             System.out.println("Bvis.size:" + B_vis.size());
-
-
         }
+
         if (B_vis.peek().isCorner() == true) {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("Right Cave");
@@ -126,6 +123,7 @@ public class BetaVis extends VisPolygon {
 //        if(Vis_temp.size() != 0  && P_temp.peek() != Vis_temp.peek()){
 
         if ((Vis_temp.size() != 0 || P_temp.size() != 1)) {
+            System.out.println("VIS TEMP POPPED IN POLYGONCYCLE");
             Vis_temp.pop();
         }
 
@@ -201,7 +199,8 @@ public class BetaVis extends VisPolygon {
         System.out.println(" in REC VIS P.size:" + P_temp.size());
         System.out.println(" in REC VIS Bvis.size:" + B_vis.size());
         GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(start, end));
-        while (P_temp.size() >= 1 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == false) {
+        while (P_temp.size() >= 1 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == false ) {
+            System.out.println("angle sum: "+ angle_sum);
             if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
                 System.out.println("in LOOOP");
 //                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BLUE);
@@ -210,9 +209,12 @@ public class BetaVis extends VisPolygon {
                 B_vis.push(P_temp.pop());
                 B_vis.peek().setLinkedtocorner(c_outerturn);
                 System.out.println("beta in recvis: "+ beta);
+//                update_angle_sum(get_second_peek(B_vis), B_vis.peek(), P_temp.peek());
             }
         }
         System.out.println("P_temp size in rec vis ENDING " + P_temp.size());
+        System.out.println("PTEMP REC ENDING POINT : "+ P_temp.peek());
+//        printStackorder(P_temp);
 //        if(P_temp.size() != 0){
 //            B_vis.push(P_temp.pop());
 //            B_vis.peek().setLinkedtocorner(c_outerturn);
@@ -257,7 +259,6 @@ public class BetaVis extends VisPolygon {
             RecursiveVisibility(P_temp, B_vis, Vis_temp, beta_chain, c_outerturn, c_outerturn, end);
         } else if (alpha <= beta_chain) {
             System.out.println("Outer Right Turn Recursive Veisbility");
-// TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             c_outerturn.setPredecessor(get_second_peek(B_vis));
             c_outerturn.setSuccessor(P_temp.peek());
             q.setTreeChild(c_outerturn);
@@ -294,7 +295,7 @@ public class BetaVis extends VisPolygon {
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BROWN);
 
 
-        // TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
         System.out.println(" INNER TURN CHAIN BEFORE end: "+ end);
         System.out.println(" INNER TURN c: "+ c);
 
@@ -302,12 +303,10 @@ public class BetaVis extends VisPolygon {
         Point v_chainend = B_vis.peek();
         Point c_current = CheckRecursionArea(Vis_temp, B_vis, beta, c, end);
 
-        // TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         end = simulateRayEndPoint(c_current.getPredecessor(), c_current);
         System.out.println("C_current predecessor: "+ c_current.getPredecessor());
         System.out.println("C_current: "+ c_current);
 
-        // TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         System.out.println(" INNER TURN CHAIN AFTER end: "+ end);
         System.out.println(" INNER TURN CHAIN AFTER c: "+ c_current);
 
@@ -352,30 +351,46 @@ public class BetaVis extends VisPolygon {
         System.out.println("--------------------------------------------------------------------------------");
 
 
-        System.out.println("alpha: " + alpha + "gamma: " + gamma);
 
-
-        while (alpha < gamma) {
-            //get treechild that has more area, usually the first childs are the ones with outerturn
-            try{
-                System.out.println("alpha prev: "+alpha);
-                alpha_child = checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek());
-                System.out.println("alpha after: "+alpha);
-                System.out.println("c_temp: "+ c_temp);
-                System.out.println("c get child: "+ c.getTreeChild().get(0));
-                System.out.println("c childlist: "+  c.getTreeChild());
-                //check if left to the rec beginning line, and right to rec end line:
-                if ( alpha < alpha_child ){
-                    c_temp = c_temp.getTreeChild().get(0);
-                    alpha = alpha_child;
-                    System.out.println("alpha after if statement: "+alpha);
-                }
-            }catch (Exception e){
-                System.out.println("Exception, no Treechild available");
-                return c_temp;
-            }
+        try {
             System.out.println("alpha: " + alpha + "gamma: " + gamma);
-        }
+            System.out.println("checkangle: "+ checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek()));
+
+            end = simulateRayEndPoint(c_temp.getTreeChild().get(0).getPredecessor(), c_temp.getTreeChild().get(0));
+            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c_temp.getTreeChild().get(0), c_temp));
+            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c_temp, end ));
+            while (checkAngle(c_temp.getTreeChild().get(0),c_temp,end) < 0 ){
+                c_temp = c_temp.getTreeChild().get(0);
+                end = simulateRayEndPoint(c_temp.getTreeChild().get(0).getPredecessor(), c_temp.getTreeChild().get(0));
+                System.out.println("checkangle in looop : "+ checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek()));
+            }
+        } catch (Exception e){
+        System.out.println("Exception, no Treechild available");
+        return c_temp;
+    }
+
+//
+//        while (alpha < gamma) {
+//            //get treechild that has more area, usually the first childs are the ones with outerturn
+//            try{
+//                System.out.println("alpha prev: "+alpha);
+//                alpha_child = checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek());
+//                System.out.println("alpha after: "+alpha);
+//                System.out.println("c_temp: "+ c_temp);
+//                System.out.println("c get child: "+ c.getTreeChild().get(0));
+//                System.out.println("c childlist: "+  c.getTreeChild());
+//                //check if left to the rec beginning line, and right to rec end line:
+//                if ( alpha < alpha_child ){
+//                    c_temp = c_temp.getTreeChild().get(0);
+//                    alpha = alpha_child;
+//                    System.out.println("alpha after if statement: "+alpha);
+//                }
+//            }catch (Exception e){
+//                System.out.println("Exception, no Treechild available");
+//                return c_temp;
+//            }
+//            System.out.println("alpha: " + alpha + "gamma: " + gamma);
+//        }
         return c_temp;
     }
 
@@ -385,8 +400,8 @@ public class BetaVis extends VisPolygon {
         double beta_chain = beta - Math.abs(checkAngle( end, c,B_vis.peek()));
         double alpha = Math.abs(checkAngle(simulateRayEndPoint(c, v_cover), v_cover, get_second_peek(B_vis)));
 
-        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(end, c));
-        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, B_vis.peek()));
+//        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(end, c));
+//        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, B_vis.peek()));
 
         System.out.println("--------------------------------------------------------------------------------");
         System.out.println("INNER TURN");
@@ -411,6 +426,9 @@ public class BetaVis extends VisPolygon {
         System.out.println("INNER TURN ENTERED alpha: " + alpha + " beta_chain: " + beta_chain);
         System.out.println("INNER TURN ENTERED alpha: " + alpha + " beta_chain: " + beta_chain);
 
+        //TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // TODO REC VIS INVERSE
+
         rec_c_points.add(v_cover);
         if (alpha < beta_chain) {
             v_cover.setPredecessor(get_second_peek(B_vis));
@@ -422,14 +440,13 @@ public class BetaVis extends VisPolygon {
             System.out.println(P.peek());
             B_vis.push(P.pop());
             B_vis.peek().setLinkedtocorner(v_cover);
+            System.out.println("GOING INTO RECURSIVE VIS INVERSE");
             RecursiveVisibilityInverse(P, B_vis, Vis_temp, beta, v_cover, v_cover, end);
+
             return true;
         } else {
-            //delete first line for delete covered points:
             v_cover.setTreeParent(c);
-//            c.setTreeChild(v_cover);
-//            beta_chain = beta_chain-alpha;
-//            beta_chain = beta_chain < 0 ? 0 : beta_chain ;
+            c.setTreeChild(v_cover);
             System.out.println("beta_chain: "+ beta_chain);
             Point rotatedintersect = simulateRayEndPoint( rotatePredeccPointCounterClockwise(beta_chain,  v_cover, c), v_cover);
             GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(v_cover, rotatedintersect));
@@ -437,23 +454,37 @@ public class BetaVis extends VisPolygon {
 //            Point v_cover_succ = B_vis.pop();
 //            B_vis.push(v_cover_succ);
             System.out.println("DELETE COVERED POINTS DONE");
-            return false;
+            return true;
         }
     }
 
-    public void RecursiveVisibilityInverse(Stack<Point> P, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c_outerturn, Point start, Point end) {
+    public void RecursiveVisibilityInverse(Stack<Point> P, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c, Point start, Point end) {
 
         //c_outerturn is q
 
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("REC VIS INVERSE");
+        System.out.println("--------------------------------------------------------------------------------");
+
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(end, c));
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, B_vis.peek()));
+
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(end, start));
+
+        System.out.println("c: "+ c);
+        System.out.println("start: "+ start);
+        System.out.println("end: "+ end);
+        System.out.println("bvis peek: "+ B_vis.peek());
+
         while (lineLineSegIntersection(start, end, B_vis.peek(), get_second_peek(B_vis)) == false) {
-            if (getEventInverse(beta, P.peek(), c_outerturn, B_vis.peek(), get_second_peek(P), end, P, B_vis, Vis_temp) == false) {
+            if (getEventInverse(beta, P.peek(), c, B_vis.peek(), get_second_peek(P), end, P, B_vis, Vis_temp) == false) {
 
                 P.push(B_vis.pop());
-                P.peek().setLinkedtocorner(c_outerturn);
+                P.peek().setLinkedtocorner(c);
             }
         }
-        P.push(B_vis.pop());
-        P.peek().setLinkedtocorner(c_outerturn);
+//        P.push(B_vis.pop());
+//        P.peek().setLinkedtocorner(c);
     }
 
 
@@ -504,8 +535,10 @@ public class BetaVis extends VisPolygon {
                 && inner_turn_before == true;
 
         //catch edge case of two collinear lines
-        if (angle == 180.0 && prev_angle == 0.0){
-            return false;
+        if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
+            System.out.println("edge case reached, popping");
+            B_vis.push(P_temp.pop());
+//            getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
         }
 
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
@@ -849,6 +882,7 @@ public class BetaVis extends VisPolygon {
 
             B_vis.push(intersect_v);
             B_vis.push(v_cover);
+            GUI.betapolygonscene.getChildren().add(intersect_v);
 
 
             System.out.println("intersection created");

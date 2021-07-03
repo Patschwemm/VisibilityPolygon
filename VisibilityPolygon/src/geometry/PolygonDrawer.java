@@ -222,4 +222,30 @@ public class PolygonDrawer {
         GUI.polygon.addNode(1097.0,91.0);
     }
 
+    public void draw_check_rec_area_tester(){
+        GUI.polygon.addNode(141.0,517.0);
+        GUI.polygon.addNode(137.0,758.0);
+        GUI.polygon.addNode(597.0,752.0);
+        GUI.polygon.addNode(446.0,417.0);
+        GUI.polygon.addNode(639.0,288.0);
+        GUI.polygon.addNode(904.0,393.0);
+        GUI.polygon.addNode(861.0,563.0);
+        GUI.polygon.addNode(679.0,569.0);
+        GUI.polygon.addNode(644.0,842.0);
+        GUI.polygon.addNode(1251.0,837.0);
+        GUI.polygon.addNode(1244.0,19.0);
+        GUI.polygon.addNode(49.0,13.0);
+        GUI.polygon.addNode(58.0,127.0);
+        GUI.polygon.addNode(542.0,119.0);
+        GUI.polygon.addNode(976.0,155.0);
+        GUI.polygon.addNode(1118.0,345.0);
+        GUI.polygon.addNode(1124.0,707.0);
+        GUI.polygon.addNode(730.0,722.0);
+        GUI.polygon.addNode(1066.0,605.0);
+        GUI.polygon.addNode(1016.0,312.0);
+        GUI.polygon.addNode(697.0,185.0);
+        GUI.polygon.addNode(220.0,169.0);
+        GUI.polygon.addNode(132.0,511.0);
+    }
+
 }

@@ -238,6 +238,16 @@ public class Settings {
         });
         addButton("Right Corridor Caves", draw_right_corridor_cave);
 
+        Button draw_checkrecursion_test = new Button("Draw");
+        draw_checkrecursion_test.setFont(font);
+        draw_checkrecursion_test.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_check_rec_area_tester();
+            }
+        });
+        addButton("Check Recursion Area tester", draw_checkrecursion_test);
+
         return gp;
     }
 
