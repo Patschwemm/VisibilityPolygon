@@ -209,7 +209,12 @@ public class BetaVis extends VisPolygon {
                 B_vis.push(P_temp.pop());
                 B_vis.peek().setLinkedtocorner(c_outerturn);
                 System.out.println("beta in recvis: "+ beta);
-//                update_angle_sum(get_second_peek(B_vis), B_vis.peek(), P_temp.peek());
+                if(lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == true){
+                    System.out.println("in IF STATEMENT");
+                    if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
+
+                    }
+                }
             }
         }
         System.out.println("P_temp size in rec vis ENDING " + P_temp.size());
@@ -301,7 +306,7 @@ public class BetaVis extends VisPolygon {
 
         //check if chain is out of recursion area
         Point v_chainend = B_vis.peek();
-        Point c_current = CheckRecursionArea(Vis_temp, B_vis, beta, c, end);
+        Point c_current = CheckRecursionArea(Vis_temp, B_vis, beta,v_chainend, c, end);
 
         end = simulateRayEndPoint(c_current.getPredecessor(), c_current);
         System.out.println("C_current predecessor: "+ c_current.getPredecessor());
@@ -335,12 +340,12 @@ public class BetaVis extends VisPolygon {
 //        }
     }
 
-    private Point CheckRecursionArea(Stack<Point> Vis_temp, Stack<Point> B_vis, double beta, Point c, Point end) {
-        double alpha = Math.abs(checkAngle(Vis_temp.peek(), c, c.getSuccessor()));
-        double alpha_child;
+    private Point CheckRecursionArea(Stack<Point> Vis_temp, Stack<Point> B_vis, double beta, Point q,Point c, Point end) {
+//        double alpha = Math.abs(checkAngle(Vis_temp.peek(), c, c.getSuccessor()));
+//        double alpha_child;
 //        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(Vis_temp.peek(), c ));
 //        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, c.getSuccessor()));
-        double gamma = Math.abs(checkAngle(Vis_temp.peek(), c, B_vis.peek()));
+//        double gamma = Math.abs(checkAngle(Vis_temp.peek(), c, B_vis.peek()));
 
         Point c_temp = c;
 //        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(Vis_temp.peek(), c ));
@@ -353,19 +358,24 @@ public class BetaVis extends VisPolygon {
 
 
         try {
-            System.out.println("alpha: " + alpha + "gamma: " + gamma);
-            System.out.println("checkangle: "+ checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek()));
-
+            System.out.println("successor: "+ c_temp.getTreeChild().get(0).getSuccessor());
+            System.out.println();
             end = simulateRayEndPoint(c_temp.getTreeChild().get(0).getPredecessor(), c_temp.getTreeChild().get(0));
-            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c_temp.getTreeChild().get(0), c_temp));
-            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c_temp, end ));
-            while (checkAngle(c_temp.getTreeChild().get(0),c_temp,end) < 0 ){
+            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c_temp.getTreeChild().get(0), q));
+            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(q, end ));
+            System.out.println("successor: "+ c_temp.getTreeChild().get(0).getSuccessor());
+            System.out.println("q: "+ q);
+            System.out.println("c_temp: "+ c_temp);
+            System.out.println("end: "+ end);
+            while (checkAngle(c_temp.getTreeChild().get(0),q,end) < 0 ){
                 c_temp = c_temp.getTreeChild().get(0);
                 end = simulateRayEndPoint(c_temp.getTreeChild().get(0).getPredecessor(), c_temp.getTreeChild().get(0));
                 System.out.println("checkangle in looop : "+ checkAngle(c_temp.getTreeChild().get(0).getSuccessor(),c,Vis_temp.peek()));
             }
         } catch (Exception e){
         System.out.println("Exception, no Treechild available");
+            System.out.println("--------------------------------------------------------------------------------");
+            System.out.println("--------------------------------------------------------------------------------");
         return c_temp;
     }
 
@@ -391,6 +401,7 @@ public class BetaVis extends VisPolygon {
 //            }
 //            System.out.println("alpha: " + alpha + "gamma: " + gamma);
 //        }
+        System.out.println("--------------------------------------------------------------------------------");
         return c_temp;
     }
 
@@ -536,9 +547,12 @@ public class BetaVis extends VisPolygon {
 
         //catch edge case of two collinear lines
         if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
-            System.out.println("edge case reached, popping");
+            System.out.println("edge case reached, popping: "+ P_temp.peek());
             B_vis.push(P_temp.pop());
-//            getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
+//            System.out.println(" in get EVENT V.size:" + Vis_temp.size());
+//            System.out.println(" in get EVENT P.size:" + P_temp.size());
+//            System.out.println(" in get EVENT Bvis.size:" + B_vis.size());
+//                        getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
         }
 
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
