@@ -171,7 +171,7 @@ public class BetaVis extends VisPolygon {
 //            c_outerturn.setTreeChild(B_vis.peek());
             System.out.println("remaining beta: " + beta);
             c_outerturn.setLocalBeta(beta);
-            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, c_outerturn, Vis_temp.peek());
+            RecursiveVisibilityInitial(P_temp, B_vis, Vis_temp, beta, c_outerturn, c_outerturn, Vis_temp.peek());
         } else if (alpha_init <= beta) {
             B_vis.push(P_temp.pop());
             GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BLUE);
@@ -180,7 +180,7 @@ public class BetaVis extends VisPolygon {
 //            c_outerturn.setTreeChild(B_vis.peek());
             System.out.println("remaining beta: " + beta);
             c_outerturn.setLocalBeta(beta);
-            RecursiveVisibility(P_temp, B_vis, Vis_temp, beta, c_outerturn, c_outerturn, Vis_temp.peek());
+            RecursiveVisibilityInitial(P_temp, B_vis, Vis_temp, beta, c_outerturn, c_outerturn, Vis_temp.peek());
         }
     }
 
@@ -189,18 +189,56 @@ public class BetaVis extends VisPolygon {
 
     }
 
+    public void RecursiveVisibilityInitial(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c_outerturn, Point start, Point end) {
+
+        //c_outerturn is q
+
+//        while (lineLineSegIntersection(start, end, P.peek(), get_second_peek(P)) == false){
+
+        System.out.println(" in REC VIS V.size:" + Vis_temp.size());
+        System.out.println(" in REC VIS P.size:" + P_temp.size());
+        System.out.println(" in REC VIS Bvis.size:" + B_vis.size());
+
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(start, end));
+        while (P_temp.peek() != get_second_peek(Vis_temp)) {
+            System.out.println(" in REC VIS V.size:" + Vis_temp.size());
+            System.out.println(" in REC VIS P.size:" + P_temp.size());
+            System.out.println(" in REC VIS Bvis.size:" + B_vis.size());
+            if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
+                System.out.println("in LOOOP");
+//                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BLUE);
+                GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(B_vis.peek(), P_temp.peek()));
+                System.out.println("P.peek in recvis" + P_temp.peek());
+                B_vis.push(P_temp.pop());
+                B_vis.peek().setLinkedtocorner(c_outerturn);
+                System.out.println("beta in recvis: "+ beta);
+            }
+        }
+        System.out.println("P_temp size in rec vis ENDING " + P_temp.size());
+//        System.out.println("PTEMP REC ENDING POINT : "+ P_temp.peek());
+//        printStackorder(P_temp);
+//        if(P_temp.size() != 0){
+//            B_vis.push(P_temp.pop());
+//            B_vis.peek().setLinkedtocorner(c_outerturn);
+//        }
+    }
+
 
     public void RecursiveVisibility(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c_outerturn, Point start, Point end) {
 
         //c_outerturn is q
 
 //        while (lineLineSegIntersection(start, end, P.peek(), get_second_peek(P)) == false){
+
         System.out.println(" in REC VIS V.size:" + Vis_temp.size());
         System.out.println(" in REC VIS P.size:" + P_temp.size());
         System.out.println(" in REC VIS Bvis.size:" + B_vis.size());
+
         GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(start, end));
-        while (P_temp.size() >= 1 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == false ) {
-            System.out.println("angle sum: "+ angle_sum);
+        while (P_temp.size()-1 >= Vis_temp.size() &&  lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == false ) {
+            System.out.println(" in REC VIS V.size:" + Vis_temp.size());
+            System.out.println(" in REC VIS P.size:" + P_temp.size());
+            System.out.println(" in REC VIS Bvis.size:" + B_vis.size());
             if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
                 System.out.println("in LOOOP");
 //                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BLUE);
@@ -210,7 +248,7 @@ public class BetaVis extends VisPolygon {
                 B_vis.peek().setLinkedtocorner(c_outerturn);
                 System.out.println("beta in recvis: "+ beta);
 
-                if(P.size() != 0 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == true){
+                if(P_temp.size() != 0 && lineLineSegIntersection(start, end, B_vis.peek(), P_temp.peek()) == true){
                     System.out.println("in IF STATEMENT");
                     if (getEvent(beta, B_vis.peek(), c_outerturn, P_temp.peek(), get_second_peek(B_vis), end, P_temp, B_vis, Vis_temp) == false) {
 
@@ -463,6 +501,9 @@ public class BetaVis extends VisPolygon {
             Point rotatedintersect = simulateRayEndPoint( rotatePredeccPointCounterClockwise(beta_chain,  v_cover, c), v_cover);
             GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(v_cover, rotatedintersect));
             delete_covered_points(P, B_vis, v_cover,rotatedintersect);
+            if(beta_chain > 0){
+                RecursiveVisibilityInverse(P, B_vis, Vis_temp, beta, v_cover, v_cover, end);
+            }
 //            Point v_cover_succ = B_vis.pop();
 //            B_vis.push(v_cover_succ);
             System.out.println("DELETE COVERED POINTS DONE");
@@ -470,7 +511,7 @@ public class BetaVis extends VisPolygon {
         }
     }
 
-    public void RecursiveVisibilityInverse(Stack<Point> P, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c, Point start, Point end) {
+    public void RecursiveVisibilityInverse(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point c, Point start, Point end) {
 
         //c_outerturn is q
 
@@ -489,10 +530,9 @@ public class BetaVis extends VisPolygon {
         System.out.println("bvis peek: "+ B_vis.peek());
 
         while (lineLineSegIntersection(start, end, B_vis.peek(), get_second_peek(B_vis)) == false) {
-            if (getEventInverse(beta, P.peek(), c, B_vis.peek(), get_second_peek(P), end, P, B_vis, Vis_temp) == false) {
-
-                P.push(B_vis.pop());
-                P.peek().setLinkedtocorner(c);
+            if (getEventInverse(beta, P_temp.peek(), c, B_vis.peek(), get_second_peek(P_temp), end, P_temp, B_vis, Vis_temp) == false) {
+                P_temp.push(B_vis.pop());
+                P_temp.peek().setLinkedtocorner(c);
             }
         }
 //        P.push(B_vis.pop());
@@ -518,9 +558,9 @@ public class BetaVis extends VisPolygon {
         double y_prev = prev_v1.getCenterY() - c.getCenterY();
 
         // angle between line of q and current vertex
-        angle = Math.atan2(x_v2 * y_v1 - y_v2 * x_v1, x_v2 * x_v1 + y_v2 * y_v1) * 180 / Math.PI;
+        angle = (Math.atan2(x_v2 * y_v1 - y_v2 * x_v1, x_v2 * x_v1 + y_v2 * y_v1) * 180 / Math.PI);
         // angle between line of q and prev vertex
-        prev_angle = Math.atan2(x_prev * y_v1 - y_prev * x_v1, x_prev * x_v1 + y_prev * y_v1) * 180 / Math.PI;
+        prev_angle = (Math.atan2(x_prev * y_v1 - y_prev * x_v1, x_prev * x_v1 + y_prev * y_v1) * 180 / Math.PI);
 
         //cases:
         //turn inner: depending on sign. prev_angle has always a bigger angle than angle
@@ -547,14 +587,90 @@ public class BetaVis extends VisPolygon {
                 && inner_turn_before == true;
 
         //catch edge case of two collinear lines
-        if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
-            System.out.println("edge case reached, popping: "+ P_temp.peek());
-            B_vis.push(P_temp.pop());
-//            System.out.println(" in get EVENT V.size:" + Vis_temp.size());
-//            System.out.println(" in get EVENT P.size:" + P_temp.size());
-//            System.out.println(" in get EVENT Bvis.size:" + B_vis.size());
-//                        getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
+//        if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
+//            System.out.println("edge case reached, popping: "+ P_temp.peek());
+//            B_vis.push(P_temp.pop());
+////            System.out.println(" in get EVENT V.size:" + Vis_temp.size());
+////            System.out.println(" in get EVENT P.size:" + P_temp.size());
+////            System.out.println(" in get EVENT Bvis.size:" + B_vis.size());
+////                        getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
+//        }
+
+        System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
+        if (inner_turn_event) {
+            System.out.println("inner turn entered");
+            vi_prev = B_vis.peek();
+            P_temp.peek().setCorner();
+            InnerTurnChain(beta, q, end, P_temp, B_vis, Vis_temp);
+            return true;
         }
+
+
+        if (outer_right_turn_event) {
+            System.out.println("outer right turn entered");
+            c.setCorner();
+            OuterRightTurn(beta, q, end, P_temp, B_vis, Vis_temp);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean getEventInverse(double beta, Point c, Point q, Point v2, Point prev_v1, Point end, Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp) {
+        double angle = 0;
+        double prev_angle = 0;
+
+
+        // x y coords of points v1
+        double x_v1 = q.getCenterX() - c.getCenterX();
+        double y_v1 = q.getCenterY() - c.getCenterY();
+
+        // x y coords of points v2
+        double x_v2 = v2.getCenterX() - c.getCenterX();
+        double y_v2 = v2.getCenterY() - c.getCenterY();
+
+        // x y coords of prev_v1
+        double x_prev = prev_v1.getCenterX() - c.getCenterX();
+        double y_prev = prev_v1.getCenterY() - c.getCenterY();
+
+        // angle between line of q and current vertex
+        angle = -1* (Math.atan2(x_v2 * y_v1 - y_v2 * x_v1, x_v2 * x_v1 + y_v2 * y_v1) * 180 / Math.PI);
+        // angle between line of q and prev vertex
+        prev_angle = -1* (Math.atan2(x_prev * y_v1 - y_prev * x_v1, x_prev * x_v1 + y_prev * y_v1) * 180 / Math.PI);
+
+        //cases:
+        //turn inner: depending on sign. prev_angle has always a bigger angle than angle
+        //turn outer right: angle bigger than prev_angle
+        //turn outer left: angle bigger than prev_angle and previous vertex not visible
+
+        boolean collinear = Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || (Math.round(prev_angle) == 0 && angle < 0);
+        boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
+                || (prev_angle < angle && angle < 0 && Math.round(prev_angle) <= 0)
+                || (((Math.round(angle) == 180) || (Math.round(angle) == -180)) && prev_angle < 0)
+                || (angle > 0 && Math.round(prev_angle) == 0 && inner_turn_before == true)
+                || (prev_angle < 0 && angle > 0)) && visibleAngle(c, q, v2) == false && !collinear
+                && !(angle > 0 && Math.round(prev_angle) == 0 && inner_turn_before == false);
+//                && !(Math.ceil(angle) == 180 && prev_angle < 0);
+        boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
+                && !visibleAngle(c, q, v2) && !collinear)
+                || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
+        boolean outer_left_turn_event = (((prev_angle > angle && angle < 0 && prev_angle < 0)
+                && !visibleAngle(prev_v1, q, c) && visibleAngle(c, q, v2)
+                && !collinear)
+                || (Math.round(angle) == -180 || Math.round(angle) == 180)
+                || (Math.round(prev_angle) == 0 && Math.round(angle) <= -180)
+                || (Math.round(angle) == -90 && Math.round(prev_angle) == 0))
+                && inner_turn_before == true;
+
+        //catch edge case of two collinear lines
+//        if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
+//            System.out.println("edge case reached, popping: "+ P_temp.peek());
+//            B_vis.push(P_temp.pop());
+////            System.out.println(" in get EVENT V.size:" + Vis_temp.size());
+////            System.out.println(" in get EVENT P.size:" + P_temp.size());
+////            System.out.println(" in get EVENT Bvis.size:" + B_vis.size());
+////                        getEvent(beta,  B_vis.peek(),  q,  P_temp.peek(), get_second_peek(B_vis), end,  P_temp,  B_vis,  Vis_temp);
+//        }
 
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
         if (inner_turn_event) {
@@ -577,7 +693,7 @@ public class BetaVis extends VisPolygon {
     }
 
 
-    private boolean getEventInverse(double beta, Point c, Point q, Point v2, Point prev_v1, Point end, Stack<Point> P, Stack<Point> B_vis, Stack<Point> Vis_temp) {
+    private boolean getEventInverseTest(double beta, Point c, Point q, Point v2, Point prev_v1, Point end, Stack<Point> P, Stack<Point> B_vis, Stack<Point> Vis_temp) {
         double angle = 0;
         double prev_angle = 0;
 
