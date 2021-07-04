@@ -328,7 +328,7 @@ public class BetaVis extends VisPolygon {
 
         // pushes chainelements to chain
         while (ChainVertex(B_vis.peek(), c, P_temp.peek(), get_second_peek(B_vis), P_temp, B_vis) == true) {
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.YELLOW);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.YELLOW);
             B_vis.push(P_temp.pop());
             System.out.println("chainvertex: "+ (ChainVertex(B_vis.peek(), c, P_temp.peek(), get_second_peek(B_vis), P_temp, B_vis) == true));
             B_vis.peek().setLinkedtocorner(c);
@@ -529,7 +529,11 @@ public class BetaVis extends VisPolygon {
         System.out.println("end: "+ end);
         System.out.println("bvis peek: "+ B_vis.peek());
 
+        // add first line to stack already:
+        P_temp.push(B_vis.pop());
+
         while (lineLineSegIntersection(start, end, B_vis.peek(), get_second_peek(B_vis)) == false) {
+            System.out.println("B_vis: "+ B_vis.peek());
             if (getEventInverse(beta, P_temp.peek(), c, B_vis.peek(), get_second_peek(P_temp), end, P_temp, B_vis, Vis_temp) == false) {
                 P_temp.push(B_vis.pop());
                 P_temp.peek().setLinkedtocorner(c);
