@@ -625,6 +625,10 @@ public class BetaVis extends VisPolygon {
         double prev_angle = 0;
 
 
+
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, v2));
+        GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, prev_v1));
+
         // x y coords of points v1
         double x_v1 = q.getCenterX() - c.getCenterX();
         double y_v1 = q.getCenterY() - c.getCenterY();
