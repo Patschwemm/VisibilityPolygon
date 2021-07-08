@@ -37,11 +37,15 @@ public class VisPolygon extends Polygon {
             PointList = pre_Processing_Points(PointList);
             pre_Processing_P(PointList, GUI.polygon.get_q());
             List_to_Stack(PointList, P, p_idx);
+            printStackorder(P);
+            printStackorder(Vis);
 
 
             // calculate visibility
             // ----------------------------------------
-            algorithm_default(P, Vis, GUI.polygon.get_q());
+            Stack<Point> vispolygon = algorithm_default(P, Vis, GUI.polygon.get_q());
+            //connects all nodes of Polygon and makes visibilityPolygon visible on Interface
+            connectEdges(vispolygon);
             showPushedNodes();
 
         } else if(betavis == true){
@@ -56,35 +60,36 @@ public class VisPolygon extends Polygon {
     // Algorithm
     // ----------------------------------------------------------------------------------------------------------------
 
-    private void algorithm_default(Stack<Point> P, Stack<Point> Vis, Point p) {
+    protected Stack<Point> algorithm_default(Stack<Point> P, Stack<Point> Vis, Point q) {
 
         // calculate visible starting point (done in Pre-Processing)
 
+        System.out.println("CALLED");
+        System.out.println("P size: "+ P.size());
 
         vi_prev = get_second_peek(Vis);
         //cycles through all nodes of polygon
-        while (!(P.size() <= 1)) {
-            boundaryCycle(P, Vis, p);
+        while (P.size() > 1) {
+            boundaryCycle(P, Vis, q);
             System.out.println("P size: " + P.size());
             System.out.println("Vis size: " + Vis.size());
         }
 
-        //connects all nodes of Polygon and makes visibilityPolygon visible on Interface
-        connectEdges(Vis);
+
+        return Vis;
         //addToScene(GUI.polygonscene, VisEdgeList);
     }
 
-    private void boundaryCycle(Stack<Point> P, Stack<Point> Vis, Point p) {
+    private void boundaryCycle(Stack<Point> P, Stack<Point> Vis, Point q) {
         //finds the turn event for current cycle
 
 //        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
 
-        while (P.size()!= 0 && !getEvent(Vis.peek(), p, P.peek(), vi_prev, P, Vis)) {
-
+        while (P.size()!= 0 && !getEvent(Vis.peek(), q, P.peek(), vi_prev, P, Vis)) {
             System.out.println("boundary cycling");
             System.out.println("P size: " + P.size());
             System.out.println("Vis size: " + Vis.size());
-            System.out.println("visible angle: " + visibleAngle(Vis.peek(), p, P.peek()));
+            System.out.println("visible angle: " + visibleAngle(Vis.peek(), q, P.peek()));
 
             vi_prev = Vis.peek();
             Vis.push(P.pop());
@@ -105,6 +110,10 @@ public class VisPolygon extends Polygon {
     protected boolean getEvent(Point c, Point q, Point v2, Point prev_v1, Stack<Point> P, Stack<Point> Vis) {
         double angle = 0;
         double prev_angle = 0;
+
+        if(c==q){
+            return false;
+        }
 
 
         // x y coords of points v1
@@ -139,6 +148,7 @@ public class VisPolygon extends Polygon {
 //                && !(Math.ceil(angle) == 180 && prev_angle < 0);
         boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
                 && !visibleAngle(c, q, v2) && !collinear)
+//                && !(angle ==  180.0 && prev_angle == 0.0)
                 || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
         boolean outer_left_turn_event = (((prev_angle > angle && angle < 0 && prev_angle < 0)
                 && !visibleAngle(prev_v1, q, c) && visibleAngle(c, q, v2)
@@ -147,6 +157,10 @@ public class VisPolygon extends Polygon {
                 || (Math.round(prev_angle) == 0 && Math.round(angle) <= -180)
                 || (Math.round(angle) == -90 && Math.round(prev_angle) == 0))
                 && inner_turn_before == true;
+
+        if(Math.round(angle) == 0 && Math.round(prev_angle) == 0){
+            return false;
+        }
 
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
         if (inner_turn_event) {
@@ -180,7 +194,7 @@ public class VisPolygon extends Polygon {
         Point c_prev = P.peek();
         Point c_prev_prev = get_second_peek(P);
         System.out.println("check angle1:" + checkAngle(Vis.peek(), q, P.peek()));
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.GREENYELLOW);
+//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.GREENYELLOW);
         update_angle_sum(Vis.peek(), q, P.peek());
         System.out.println("check angle2:" + checkAngle(P.peek(), q, get_second_peek(P)));
         update_angle_sum(P.peek(), q, get_second_peek(P));
@@ -496,11 +510,17 @@ public class VisPolygon extends Polygon {
         System.out.println("cross_c: " + cross_c);
         System.out.println("cross_d: " + cross_d);
 
+        System.out.println("in Intersection point: "+ C);
+
+
+
 
         //different signs mean there is an intersection
-        boolean almost_zero = cross_c > -0.00000001 && cross_c <= 0 || cross_d > -0.00000001 && cross_d <= 0 ;
+        boolean almost_zero = (cross_c > -0.00001 && cross_c <= 0) || (cross_d > -0.00001 && cross_d <= 0 )
+                || (cross_c < 1.318767317570746E-7 && cross_c >= 0) || (cross_d < 1.318767317570746E-7  && cross_d >= 0);
+        System.out.println("almost zero: "+ almost_zero);
         //cross_c == 0 || cross_d == 0
-        if ((Math.signum(cross_d) != Math.signum(cross_c) || cross_c == 0 || cross_d == 0 )
+        if ((Math.signum(cross_d) != Math.signum(cross_c) || cross_c == 0 || cross_d == 0  || almost_zero)
                 && !(cross_c == 0 && cross_d == 0)) {
             System.out.println("intersection of segment");
             return true;
@@ -824,5 +844,16 @@ public class VisPolygon extends Polygon {
             scene.getChildren().add(e.get(i));
         }
     }
+
+    public void printStackorder(Stack<Point> Stack) {
+
+        Stack<Point> temp = (java.util.Stack<Point>) Stack.clone();
+
+        int size = Stack.size();
+        for (int i = 0; i < size; i++) {
+            System.out.println("number: " + i + temp.pop());
+        }
+    }
+
 }
 

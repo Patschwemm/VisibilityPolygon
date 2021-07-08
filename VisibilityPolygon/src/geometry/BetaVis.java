@@ -290,6 +290,10 @@ public class BetaVis extends VisPolygon {
 
         rec_c_points.add(c_outerturn);
         System.out.println("alpha: " + alpha + "beta: " + beta_chain);
+        if (alpha == 0.0){
+            B_vis.push(P_temp.pop());
+            B_vis.peek().setLinkedtocorner(c_outerturn);
+        }else
         if (alpha > beta_chain) {
             c_outerturn.setPredecessor(get_second_peek(B_vis));
             c_outerturn.setSuccessor(P_temp.peek());
@@ -339,19 +343,17 @@ public class BetaVis extends VisPolygon {
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(B_vis.peek())).setFill(Color.BROWN);
 
 
-
-        System.out.println(" INNER TURN CHAIN BEFORE end: "+ end);
         System.out.println(" INNER TURN c: "+ c);
+        System.out.println(" INNER TURN CHAIN BEFORE end: "+ end);
+
 
         //check if chain is out of recursion area
         Point v_chainend = B_vis.peek();
         Point c_current = CheckRecursionArea(Vis_temp, B_vis, beta,v_chainend, c, end);
 
         end = simulateRayEndPoint(c_current.getPredecessor(), c_current);
-        System.out.println("C_current predecessor: "+ c_current.getPredecessor());
-        System.out.println("C_current: "+ c_current);
-
-        System.out.println(" INNER TURN CHAIN AFTER end: "+ end);
+        System.out.println(" INNER TURN CHAIN AFTER C_current predecessor: "+ c_current.getPredecessor());
+        System.out.println(" INNER TURN CHAIN AFTER simulate end: "+ end);
         System.out.println(" INNER TURN CHAIN AFTER c: "+ c_current);
 
 
@@ -363,20 +365,19 @@ public class BetaVis extends VisPolygon {
 
         //push visible chain elements back on Stack B vis if no recursion is entered
 
-//        if (recursion == false) {
-//
-//            while (B_vis.peek() != v_chainend) {
-//                B_vis.push(P_temp.pop());
-//                B_vis.peek().setLinkedtocorner(c_current);
-//            }
+        if (recursion == true) {
+
+            while (B_vis.peek() != v_chainend) {
+                B_vis.push(P_temp.pop());
+                B_vis.peek().setLinkedtocorner(c_current);
+            }
 //            B_vis.push(P_temp.pop());
 //            B_vis.peek().setLinkedtocorner(c_current);
-//
-//            if (c_current != c) {
-//                RecursiveVisibility(P_temp, B_vis, Vis_temp, c_current.getLocalBeta(), c_current, c_current, end);
-//            }
-//
-//        }
+
+            if (c_current != c) {
+                RecursiveVisibility(P_temp, B_vis, Vis_temp, c_current.getLocalBeta(), c_current, c_current, end);
+            }
+        }
     }
 
     private Point CheckRecursionArea(Stack<Point> Vis_temp, Stack<Point> B_vis, double beta, Point q,Point c, Point end) {
@@ -479,6 +480,8 @@ public class BetaVis extends VisPolygon {
         //TODO ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // TODO REC VIS INVERSE
 
+        end = simulateRayEndPoint(c, v_cover);
+
         rec_c_points.add(v_cover);
         if (alpha < beta_chain) {
             v_cover.setPredecessor(get_second_peek(B_vis));
@@ -488,8 +491,8 @@ public class BetaVis extends VisPolygon {
             beta = beta_chain - alpha;
             v_cover.setLocalBeta(beta_chain);
             System.out.println(P.peek());
-            B_vis.push(P.pop());
-            B_vis.peek().setLinkedtocorner(v_cover);
+//            B_vis.push(P.pop());
+//            B_vis.peek().setLinkedtocorner(v_cover);
             System.out.println("GOING INTO RECURSIVE VIS INVERSE");
             RecursiveVisibilityInverse(P, B_vis, Vis_temp, beta, v_cover, v_cover, end);
 
@@ -500,14 +503,18 @@ public class BetaVis extends VisPolygon {
             System.out.println("beta_chain: "+ beta_chain);
             Point rotatedintersect = simulateRayEndPoint( rotatePredeccPointCounterClockwise(beta_chain,  v_cover, c), v_cover);
             GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(v_cover, rotatedintersect));
-            delete_covered_points(P, B_vis, v_cover,rotatedintersect);
+            System.out.println("c before delete cover: "+ c);
+            System.out.println("v_cover before delete cover: "+ v_cover);
+            System.out.println("rotatedintersct before delete cover: "+ rotatedintersect);
+            delete_covered_points(P, B_vis, c,v_cover,rotatedintersect);
             if(beta_chain > 0){
                 RecursiveVisibilityInverse(P, B_vis, Vis_temp, beta, v_cover, v_cover, end);
+                return true;
             }
 //            Point v_cover_succ = B_vis.pop();
 //            B_vis.push(v_cover_succ);
             System.out.println("DELETE COVERED POINTS DONE");
-            return true;
+            return false;
         }
     }
 
@@ -527,14 +534,19 @@ public class BetaVis extends VisPolygon {
         System.out.println("c: "+ c);
         System.out.println("start: "+ start);
         System.out.println("end: "+ end);
-        System.out.println("bvis peek: "+ B_vis.peek());
+        System.out.println("bvis peek before : "+ B_vis.peek());
+
+        GUI.polygonscene.getChildren().add(end);
 
         // add first line to stack already:
         P_temp.push(B_vis.pop());
+        P_temp.peek().setLinkedtocorner(c);
+
+        System.out.println("bvis peek after: "+ B_vis.peek());
 
         while (lineLineSegIntersection(start, end, B_vis.peek(), get_second_peek(B_vis)) == false) {
-            System.out.println("B_vis: "+ B_vis.peek());
-            if (getEventInverse(beta, P_temp.peek(), c, B_vis.peek(), get_second_peek(P_temp), end, P_temp, B_vis, Vis_temp) == false) {
+            System.out.println("B_vis IN REC VIS LOOP: "+ B_vis.peek());
+            if (getEventInverseTest(beta, P_temp.peek(), c, B_vis.peek(), get_second_peek(P_temp), end, P_temp, B_vis, Vis_temp) == false) {
                 P_temp.push(B_vis.pop());
                 P_temp.peek().setLinkedtocorner(c);
             }
@@ -624,32 +636,45 @@ public class BetaVis extends VisPolygon {
         double angle = 0;
         double prev_angle = 0;
 
+//        Point q_temp = q;
+//        c = createNode(-1 * c.getCenterX(), c.getCenterY());
+//        v2 =createNode(-1 * v2.getCenterX(), v2.getCenterY());
+//        prev_v1 = createNode(-1 * prev_v1.getCenterX(), prev_v1.getCenterY());
 
 
         GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, v2));
         GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(c, prev_v1));
 
+        System.out.println("GET EVENT INVERSE c"+ c);
+        System.out.println("GET EVENT INVERSE B.peek()"+ v2);
+        System.out.println("GET EVENT INVERSE P.peek()"+ c);
+        System.out.println("GET EVENT INVERSE getsecond Ppeek()"+ prev_v1);
+
+
+
         // x y coords of points v1
-        double x_v1 = q.getCenterX() - c.getCenterX();
+        double x_v1 = (-1 * q.getCenterX()) - (-1 * c.getCenterX());
         double y_v1 = q.getCenterY() - c.getCenterY();
 
         // x y coords of points v2
-        double x_v2 = v2.getCenterX() - c.getCenterX();
+        double x_v2 = (-1 * v2.getCenterX()) - (-1 * c.getCenterX());
         double y_v2 = v2.getCenterY() - c.getCenterY();
 
         // x y coords of prev_v1
-        double x_prev = prev_v1.getCenterX() - c.getCenterX();
+        double x_prev = (-1 * prev_v1.getCenterX()) - (-1 * c.getCenterX());
         double y_prev = prev_v1.getCenterY() - c.getCenterY();
 
         // angle between line of q and current vertex
-        angle = -1* (Math.atan2(x_v2 * y_v1 - y_v2 * x_v1, x_v2 * x_v1 + y_v2 * y_v1) * 180 / Math.PI);
+        angle = (Math.atan2(x_v2 * y_v1 - y_v2 * x_v1, x_v2 * x_v1 + y_v2 * y_v1) * 180 / Math.PI);
         // angle between line of q and prev vertex
-        prev_angle = -1* (Math.atan2(x_prev * y_v1 - y_prev * x_v1, x_prev * x_v1 + y_prev * y_v1) * 180 / Math.PI);
+        prev_angle = (Math.atan2(x_prev * y_v1 - y_prev * x_v1, x_prev * x_v1 + y_prev * y_v1) * 180 / Math.PI);
 
         //cases:
         //turn inner: depending on sign. prev_angle has always a bigger angle than angle
         //turn outer right: angle bigger than prev_angle
         //turn outer left: angle bigger than prev_angle and previous vertex not visible
+
+
 
         boolean collinear = Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || (Math.round(prev_angle) == 0 && angle < 0);
         boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
@@ -669,6 +694,8 @@ public class BetaVis extends VisPolygon {
                 || (Math.round(prev_angle) == 0 && Math.round(angle) <= -180)
                 || (Math.round(angle) == -90 && Math.round(prev_angle) == 0))
                 && inner_turn_before == true;
+
+
 
         //catch edge case of two collinear lines
 //        if ((angle == 180.0 && prev_angle == 0.0) || (angle == 0.0 && prev_angle == 0.0)){
@@ -728,40 +755,43 @@ public class BetaVis extends VisPolygon {
         //turn outer right: angle bigger than prev_angle
         //turn outer left: angle bigger than prev_angle and previous vertex not visible
 
-        boolean collinear = Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || (Math.round(prev_angle) == 0 && angle < 0);
-        boolean inner_turn_event = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
-                || (prev_angle < angle && angle < 0 && Math.round(prev_angle) <= 0)
-                || (((Math.round(angle) == 180) || (Math.round(angle) == -180)) && prev_angle < 0)
-                || (angle > 0 && Math.round(prev_angle) == 0 && inner_turn_before == true)
-                || (prev_angle < 0 && angle > 0)) && visibleAngle(c, q, v2) == false && !collinear
-                && !(angle > 0 && Math.round(prev_angle) == 0 && inner_turn_before == false);
-//                && !(Math.ceil(angle) == 180 && prev_angle < 0);
-        boolean outer_right_turn_event = ((prev_angle < angle && Math.round(prev_angle) >= 0
-                && !visibleAngle(c, q, v2) && !collinear)
-                || (angle > 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
-        boolean outer_left_turn_event = (((prev_angle > angle && angle < 0 && prev_angle < 0)
-                && !visibleAngle(prev_v1, q, c) && visibleAngle(c, q, v2)
-                && !collinear)
-                || (Math.round(angle) == -180 || Math.round(angle) == 180)
-                || (Math.round(prev_angle) == 0 && Math.round(angle) <= -180)
-                || (Math.round(angle) == -90 && Math.round(prev_angle) == 0))
+
+
+        boolean collinear_inverse = Math.round(angle) == 180.0 || Math.round(angle) == -180.0 || (Math.round(prev_angle) == 0 && angle < 0);
+        boolean inner_turn_event_inverse = ((prev_angle > angle && angle > 0 && Math.round(prev_angle) >= 0)
+                || ( prev_angle > angle && angle > 0 && Math.round(prev_angle) <= 0)
+                || (((Math.round(angle) == 180) || Math.round(angle) == -180) && prev_angle > 0)
+                || (angle < 0 && Math.round(prev_angle) == 0 && inner_turn_before ==true)
+                || (prev_angle > 0 && angle < 0 )) &&  visibleAngle(c,q,v2) == false && !collinear_inverse
+                && !(angle < 0 && Math.round(prev_angle) == 0 && inner_turn_before == false);
+        boolean outer_right_turn_event_inverse = ((prev_angle < angle && Math.round(prev_angle )>= 0
+                && visibleAngle(c,q,v2) && !collinear_inverse)
+                || (angle < 0 && Math.round(prev_angle) == 0)) && inner_turn_before == false;
+        boolean outer_left_turn_event_inverse = (((prev_angle < angle && angle > 0 && prev_angle >0)
+                && visibleAngle(prev_v1,q,c) && visibleAngle(c,q,v2)
+                && !collinear_inverse)
+                || (Math.round(angle)== -180 || Math.round(angle) == 180) // maybe
+                || (Math.round(prev_angle) == 0 && Math.round(angle) <= -180) // maybe
+                || (Math.round(angle) == -90 && Math.round(prev_angle) == 0)) // maybe
                 && inner_turn_before == true;
 
+
+
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
-        //exchange inner turn event with outer turn event
-        if (inner_turn_event) {
+        //call methods do delete Points, but call Stacks so that it pushes into P and deletes B_vis
+        if (inner_turn_event_inverse) {
             System.out.println("inner turn entered");
             vi_prev = B_vis.peek();
             P.peek().setCorner();
-            InnerTurnChain(beta, q, end, B_vis, P, Vis_temp);
+            InnerTurnChain(beta, q, end, P, B_vis, Vis_temp);
             return true;
         }
 
         //exchange outer turn event with inner turn event
-        if (outer_right_turn_event) {
+        if (outer_right_turn_event_inverse) {
             System.out.println("outer right turn entered");
             c.setCorner();
-            OuterRightTurn(beta, q, end, B_vis, P, Vis_temp);
+            OuterRightTurn(beta, q, end, P, B_vis, Vis_temp);
             return true;
         }
 
@@ -866,7 +896,7 @@ public class BetaVis extends VisPolygon {
             }
         }
 
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.WHITE);
+//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.WHITE);
 
         System.out.println(" °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°p.size:" + P.size());
         System.out.println(P.peek());
@@ -880,7 +910,8 @@ public class BetaVis extends VisPolygon {
         System.out.println("intersection created");
         System.out.println(intersect_v);
         intersect_v.setPointLinked(c);
-        GUI.betapolygonscene.getChildren().add(intersect_v);
+//        intersect_v.setStroke(Color.WHITE);
+//        GUI.betapolygonscene.getChildren().add(intersect_v);
 
 
         System.out.println("range: c " + inRange(q, c) + " linkp: " + inRange(q, intersect_v));
@@ -941,14 +972,15 @@ public class BetaVis extends VisPolygon {
     }
 
 
-    @Override
-    protected void delete_covered_points(Stack<Point> P, Stack<Point> B_vis, Point q, Point c) {
+
+    protected void delete_covered_points(Stack<Point> P, Stack<Point> B_vis, Point c, Point start, Point end) {
         //Point as new artificial edge node point
         Point linkedPoint = null;
         Point intersect_v = new Point();
         Point v_cover = B_vis.peek();
         B_vis.pop();
-        System.out.println("q: in delete "+ q);
+        System.out.println("start: in delete "+ start);
+        System.out.println("end in delete: "+ end);
         System.out.println("c: in delete "+ c);
         System.out.println("v_cover: "+ v_cover);
 
@@ -956,7 +988,7 @@ public class BetaVis extends VisPolygon {
 
 
 
-        while ((lineLineSegIntersection(q, c, B_vis.peek(), get_second_peek(B_vis)) == false)) {
+        while ((lineLineSegIntersection(start, end, B_vis.peek(), get_second_peek(B_vis)) == false)) {
             System.out.println("in delete covered points");
             System.out.println();
             if (linkedPoint == null){
@@ -964,7 +996,8 @@ public class BetaVis extends VisPolygon {
             } else {
                 if ( linkedPoint.getPointLinked() == null){
                     linkedPoint = popLinked(B_vis);
-                } else if (inRange(q, c) > inRange(q, linkedPoint.getPointLinked() )){
+                } else if (inRange(start, c) > inRange(start, linkedPoint.getPointLinked() )){
+                    System.out.println("CONDITION: range: c " + inRange(start, c) + " linkp: " + inRange(start, linkedPoint));
                     break;
                 }else {
                     linkedPoint = popLinked(B_vis);
@@ -972,7 +1005,8 @@ public class BetaVis extends VisPolygon {
             }
             if (linkedPoint != null
                     && linkedPoint.getPointLinked() != null
-                    && inRange(q, c) > inRange(q, linkedPoint.getPointLinked())) {
+                    && inRange(start, c) > inRange(start, linkedPoint.getPointLinked())) {
+                System.out.println("CONDITION: range: c " + inRange(start, c) + " linkp: " + inRange(start, linkedPoint));
 
             }
         }
@@ -980,15 +1014,21 @@ public class BetaVis extends VisPolygon {
 
 
         try{
+            System.out.println("q: in delete "+ start);
+            System.out.println("c: in delete "+ c);
+            System.out.println("v_cover: "+ v_cover);
             System.out.println("linkedpoint in B_vis DELETE COVERED POINTS: "+ linkedPoint);
             System.out.println("CONDITION: get linkedpoint not null "+ linkedPoint.getPointLinked() != null);
             System.out.println("CONDITION: linkedpoint not null "+ linkedPoint!= null);
-            System.out.println("CONDITION RANGE: "+ (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())));
-            System.out.println("CONDITION: range: c " + inRange(q, c) + " linkp: " + inRange(q, linkedPoint));
+            System.out.println("linkedpoint: "+ linkedPoint);
+            System.out.println("linkedpoint get linkedpoint: "+ linkedPoint.getPointLinked());
+            System.out.println("CONDITION RANGE getlinkpoint: "+ (inRange(start, c) < inRange(start, linkedPoint.getPointLinked())));
+            System.out.println("CONDITION RANGE linkedpoint: "+ (inRange(start, c) < inRange(start, linkedPoint)));
+            System.out.println("CONDITION: range: c " + inRange(start, c) + " linkp: " + inRange(start, linkedPoint));
 //            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(q, c));
 //            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(q, linkedPoint.getPointLinked()));
 
-            System.out.println("q: "+ q);
+            System.out.println("q: "+ start);
             System.out.println("c: "+ c);
             System.out.println("getlinked: "+ linkedPoint.getPointLinked());
         } catch(Exception e){
@@ -997,9 +1037,8 @@ public class BetaVis extends VisPolygon {
 
 
         if (linkedPoint != null
-                && linkedPoint.getPointLinked() != null
-                && inRange(q, c) > inRange(q, linkedPoint.getPointLinked())) {
-            System.out.println("range: c " + inRange(q, c) + " linkp: " + inRange(q, linkedPoint));
+                && linkedPoint.getPointLinked() != null){
+            System.out.println("range: c " + inRange(start, c) + " linkp: " + inRange(start, linkedPoint));
             System.out.println("IN PREVIOUS POINT COVERED");
             //pop previous ntersect point and v_cover
 
@@ -1014,13 +1053,14 @@ public class BetaVis extends VisPolygon {
 
 
             //line intersection of 4 points (2 node for first edge, 2 for second edge)
-            intersect_v = lineLineIntersection(q, c, B_vis.peek(), get_second_peek(B_vis));
+            intersect_v = lineLineIntersection(start, end, B_vis.peek(), get_second_peek(B_vis));
             B_vis.pop();
 
 
 
             B_vis.push(intersect_v);
             B_vis.push(v_cover);
+            System.out.println("intersect point" +intersect_v);
             GUI.betapolygonscene.getChildren().add(intersect_v);
 
 
@@ -1149,8 +1189,8 @@ public class BetaVis extends VisPolygon {
         System.out.println("c: " + c);
 
         //y = mx +b;
-        m_x = (c.getCenterX() - q.getCenterX()) * 2;
-        m_y = (c.getCenterY() - q.getCenterY()) * 2;
+        m_x = (c.getCenterX() - q.getCenterX()) * 0.5;
+        m_y = (c.getCenterY() - q.getCenterY()) * 0.5;
 
 
         double x = c.getCenterX() + m_x;

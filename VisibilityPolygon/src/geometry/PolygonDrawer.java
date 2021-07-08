@@ -248,4 +248,31 @@ public class PolygonDrawer {
         GUI.polygon.addNode(132.0,511.0);
     }
 
+    public void draw_custom_polygon(){
+//        number: 0Circle[centerX=173.0, centerY=333.0, radius=5.5, fill=0x008000ff, stroke=0x000000ff, strokeWidth=1.0]
+//        number: 1Circle[centerX=148.4183271294066, centerY=513.2656010510182, radius=5.5, fill=0x000000ff, stroke=0x000000ff, strokeWidth=1.0]
+//        number: 2Circle[centerX=479.0, centerY=562.0, radius=5.5, fill=0x000000ff, stroke=0x000000ff, strokeWidth=1.0]
+//        number: 3Circle[centerX=228.89083910663527, centerY=280.4323999753809, radius=5.5, fill=0x000000ff, stroke=0x000000ff, strokeWidth=1.0]
+        GUI.polygon.addNode(1123.0,391.0);
+        GUI.polygon.addNode(438.0,398.0);
+        GUI.polygon.addNode(459.0,257.0);
+        GUI.polygon.addNode(605.0,114.0);
+        GUI.polygon.addNode(464.0,47.0);
+        GUI.polygon.addNode(370.0,93.0);
+        GUI.polygon.addNode(356.0,248.0);
+        GUI.polygon.addNode(347.0,329.0);
+        GUI.polygon.addNode(171.0,250.0);
+        GUI.polygon.addNode(179.0,114.0);
+        GUI.polygon.addNode(282.0,44.0);
+        GUI.polygon.addNode(248.0,36.0);
+        GUI.polygon.addNode(100.0,112.0);
+        GUI.polygon.addNode(101.0,276.0);
+        GUI.polygon.addNode(281.0,348.0);
+        GUI.polygon.addNode(339.0,362.0);
+        GUI.polygon.addNode(359.0,549.0);
+        GUI.polygon.addNode(441.0,740.0);
+        GUI.polygon.addNode(1000.0,743.0);
+        GUI.polygon.addNode(1128.0,394.0);
+    }
+
 }

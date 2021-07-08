@@ -131,16 +131,16 @@ public class Settings {
                     if (newvalue.intValue() == 0){
                         VisPolygon.betavis = false;
                         System.out.println("newvalue = 0.0, deleted");
-                        GUI.betavis_q.deleteBetaVisPolygon();
+                        GUI.betavis_q_rec.deleteBetaVisPolygon();
                     } else if (oldvalue.intValue() == 0 && newvalue.intValue()!= 0){
                         VisPolygon.betavis = true;
                         System.out.println("initial new polygon ");
-                        GUI.betavis_q = new BetaVis(beta.getValue());
+                        GUI.betavis_q_rec = new Beta_Visibility_Brute(beta.getValue());
                     } else{
                         VisPolygon.betavis = true;
                         System.out.println("deleted and created");
-                        GUI.betavis_q.deleteBetaVisPolygon();
-                        GUI.betavis_q = new BetaVis(beta.getValue());
+                        GUI.betavis_q_rec.deleteBetaVisPolygon();
+                        GUI.betavis_q_rec = new Beta_Visibility_Brute(beta.getValue());
                     }
                 }else {
                     System.out.println("Input Visibility Polygon and necessities");
@@ -247,6 +247,16 @@ public class Settings {
             }
         });
         addButton("Check Recursion Area tester", draw_checkrecursion_test);
+
+        Button draw_custom_polygon = new Button("Draw");
+        draw_custom_polygon.setFont(font);
+        draw_custom_polygon.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_custom_polygon();
+            }
+        });
+        addButton("Custom Polygon", draw_custom_polygon);
 
         return gp;
     }

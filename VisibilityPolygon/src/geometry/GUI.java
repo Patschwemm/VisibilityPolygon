@@ -17,6 +17,7 @@ public class GUI extends Application {
     public static Polygon polygon = new Polygon();
     public static VisPolygon vis_q;
     public static BetaVis betavis_q = null;
+    public static Beta_Visibility_Brute betavis_q_rec = null;
     public static Stage primary;
     public static Group pointscene = new Group();
     public static Group edgescene = new Group();
