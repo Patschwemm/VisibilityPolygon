@@ -111,6 +111,11 @@ public class VisPolygon extends Polygon {
         double angle = 0;
         double prev_angle = 0;
 
+        System.out.println("Get even of Points: ");
+        System.out.println("Point c: "+ c.getCenterX()+ " "+ c.getCenterY());
+        System.out.println("Point v2: "+ v2.getCenterX()+ " "+ v2.getCenterY());
+        System.out.println("Point prev v: "+ prev_v1.getCenterX()+ " "+ prev_v1.getCenterY());
+        System.out.println("Point q: "+ q.getCenterX()+ " "+ q.getCenterY());
         if(c==q){
             return false;
         }
@@ -217,7 +222,7 @@ public class VisPolygon extends Polygon {
             }
         }
 
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
+//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
 
         System.out.println(" °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°p.size:"+ P.size());
         System.out.println(P.peek());
@@ -291,7 +296,7 @@ public class VisPolygon extends Polygon {
 
         while ((visibleAngle(P.peek(), q, Vis.peek()) == false)) {
             System.out.println("In FAST FORWARD      checkangle: " + checkAngle(P.peek(), q, get_second_peek(Vis)));
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
             vi_prev = P.pop();
         }
         GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
@@ -305,6 +310,7 @@ public class VisPolygon extends Polygon {
         //Point as new artificial edge node point
         Point linkedPoint = null;
         Point intersect_v = new Point();
+        c.setPredecessor(Vis.peek());
 
 
         //deletes all vertices left to the vector pc
@@ -729,11 +735,11 @@ public class VisPolygon extends Polygon {
     protected Point popLinked(Stack<Point> Stack) {
         Point point;
         point = Stack.pop();
-        try{
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(point)).setFill(Color.WHITE);
-        }catch (Exception e){
-            System.out.println("error: "+ e);
-        }
+//        try{
+//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(point)).setFill(Color.WHITE);
+//        }catch (Exception e){
+//            System.out.println("error: "+ e);
+//        }
 
         if (point.getPointLinked() != null) {
             System.out.println("----------- Point is linked");

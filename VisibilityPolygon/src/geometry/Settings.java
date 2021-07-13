@@ -208,6 +208,16 @@ public class Settings {
         });
         addButton("Generic Right Cave", draw_right_cave);
 
+        Button draw_left_cave = new Button("Draw");
+        draw_left_cave.setFont(font);
+        draw_left_cave.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_generic_left_cave();
+            }
+        });
+        addButton("Generic Left Cave", draw_left_cave);
+
         Button draw_reverse_s_polygon = new Button("Draw");
         draw_reverse_s_polygon.setFont(font);
         draw_reverse_s_polygon.setOnAction(new EventHandler<ActionEvent>() {
