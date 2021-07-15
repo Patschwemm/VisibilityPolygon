@@ -2,6 +2,7 @@ package geometry;
 
 import javafx.scene.paint.Color;
 
+import java.beans.Expression;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,6 +22,19 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
             reset_angle();
             System.out.println();
+
+            int size = P.size();
+            Stack<Point> P_test = (Stack<Point>) P.clone();
+
+            System.out.println("normal points:");
+            for (int i=0; i < size; i++){
+                System.out.println("peek:" +P_test.peek());
+                System.out.println("predecessor:" +P_test.pop().getPredecessor());
+                System.out.println();
+            }
+
+
+
             System.out.println();
             System.out.println();
             System.out.println("--------------------------------------------------------------------------------");
@@ -86,12 +100,11 @@ public class Beta_Visibility_Brute extends VisPolygon {
         System.out.println("P_temp: ");
         printStackordertoPolygon(P_temp);
         System.out.println("first element: ");
-        System.out.println(P_temp.peek());
 
         System.out.println("Vis_temp: ");
         printStackordertoPolygon(Vis_temp);
         System.out.println("first element: ");
-        System.out.println(Vis_temp.peek());
+
 
         while (P_temp.size() != 0 && Vis_temp.size() != 0 && P_temp.peek() == Vis_temp.peek()) {
             B_vis.push(P_temp.pop());
@@ -104,13 +117,15 @@ public class Beta_Visibility_Brute extends VisPolygon {
         try{
             System.out.println("P peek out of sync: "+ P_temp.peek());
             System.out.println("Vis peek out of sync: "+ Vis_temp.peek());
+            System.out.println("B_vis peek get intersect: "+ B_vis.peek());
+            System.out.println("B_vis peek get intersect: "+ B_vis.peek().getIntersect());
         } catch (Exception e ){
             System.out.println("no corner");
         }
 
-        System.out.println("B_vispeek: " + B_vis.peek().getCenterX() + " " + B_vis.peek().getCenterY() + " is corner?" + B_vis.peek().isCorner());
+        System.out.println("B_vispeek: " + B_vis.peek().getCenterX() + " " + B_vis.peek().getCenterY() + " is corner?" + B_vis.peek().getIntersect() != null);
 
-        if (B_vis.peek().isCorner() == true && P_temp.size() != 0 && Vis_temp.size() != 0) {
+        if (B_vis.peek().getIntersect() != null && P_temp.size() != 0 && Vis_temp.size() != 0) {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("Right Cave");
             System.out.println("--------------------------------------------------------------------------------");
@@ -118,7 +133,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
             System.out.println("P.size:" + P_temp.size());
             rightCave(P_temp, B_vis, Vis_temp, beta, q);
             polygonCycle(P_temp, Vis_temp, beta, q);
-        } else if (B_vis.peek().isCorner() == false && P_temp.size() != 0 && Vis_temp.size() != 0) {
+        } else if (B_vis.peek().getIntersect() == null && P_temp.size() != 0 && Vis_temp.size() != 0) {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("Left Cave");
             System.out.println("--------------------------------------------------------------------------------");
@@ -126,6 +141,10 @@ public class Beta_Visibility_Brute extends VisPolygon {
             System.out.println("P.size:" + P_temp.size());
             leftCave(P_temp, B_vis, Vis_temp, beta, q);
 //            polygonCycle(P_temp,Vis_temp,beta,q);
+        }
+
+        while (P_temp.size() != 0 && Vis_temp.size() != 0 && P_temp.peek() == Vis_temp.peek()) {
+           polygonCycle(P_temp, Vis_temp, beta, q);
         }
 
         System.out.println("breakpoint");
@@ -147,7 +166,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
         if (direction == "right") {
 
-            get_second_peek(P_temp).setPredecessor(P_temp.peek());
+//            get_second_peek(P_temp).setPredecessor(P_temp.peek());
             P_temp.pop();
             temp = getPartPolygonRight(P_temp, Vis_temp);
 
@@ -268,7 +287,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
             //construct polygon for recursive visibility
 
-            temp = getWholePolygonLeft(P_temp, Vis_temp);
+            temp = getWholePolygonLeft(P_temp, Vis_temp, q);
             System.out.println("Vis_temp popped: " + Vis_temp.peek());
 //            temp.push(end);
             temp.push(Vis_temp.pop());
@@ -352,14 +371,12 @@ public class Beta_Visibility_Brute extends VisPolygon {
         //recursive beta calculated from point q
         System.out.println("q: " + q);
         System.out.println("c outerturn: " + c_outerturn);
-        double old_beta = -100;
 
         if (q != GUI.polygon.get_q()) {
             Point q_parent = q.getTreeParent();
             System.out.println("q_parent:" + q_parent);
             Point prev_end = simulateRayEndPoint(q_parent, q);
             System.out.println("old beta :" + beta);
-            old_beta = beta;
             beta = beta - Math.abs(checkAngle(prev_end, q, c_outerturn));
 //            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(prev_end, q));
 //            GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(q, c_outerturn));
@@ -370,7 +387,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         if (alpha_init > beta) {
 
             //predecessor is q, so that we get the artificial edge
-            c_outerturn.setPredecessor(q);
+//            c_outerturn.setPredecessor(q);
             c_outerturn.setSuccessor(P_temp.peek());
             c_outerturn.setTreeParent(q);
             q.setTreeChild(c_outerturn);
@@ -386,7 +403,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         } else if (alpha_init <= beta) {
 
             //predecessor is q, so that we get the artificial edge
-            c_outerturn.setPredecessor(q);
+//            c_outerturn.setPredecessor(q);
             c_outerturn.setSuccessor(P_temp.peek());
             c_outerturn.setTreeParent(q);
             q.setTreeChild(c_outerturn);
@@ -408,9 +425,8 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
 
         System.out.println("Start: " + B_vis.peek());
-        System.out.println("B_vis püeek corner: " + B_vis.peek().isCorner());
         System.out.println("end in caveintersectrotat: " + end);
-        if (B_vis.peek().isCorner()) {
+        if (B_vis.peek().getIntersect() != null) {
             System.out.println("clockwise rotation ");
             q_rotation = rotatePredeccPointClockwise(beta, c, q);
         } else {
@@ -434,7 +450,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         while (P_clone.peek() != end && P_clone.size() >= 2) {
             System.out.println("P_temp.size in cave intersect rotate: " + P_clone.size());
             System.out.println("angle1:" + visibleAngle(P_clone.peek(), c, Vis_temp.peek()) + "visible2: " + visibleAngle(P_clone.peek(), c, get_second_peek(P_clone)));
-            if (B_vis.peek().isCorner()) {
+            if (B_vis.peek().getIntersect() != null) {
                 if (lineLineSegIntersection(q_rotation, c, P_clone.peek(), get_second_peek(P_clone)) == true
                         && visibleAngle(P_clone.peek(), c, Vis_temp.peek())
                         && visibleAngle(P_clone.peek(), c, get_second_peek(P_clone))) {
@@ -448,13 +464,15 @@ public class Beta_Visibility_Brute extends VisPolygon {
                         min_range = inRange(q_rotation, temp_intersect);
                         intersect_v = temp_intersect;
                         GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(P_temp.peek(), get_second_peek(P_temp)));
+                        System.out.println("end"+ end);
+                        System.out.println("getsecond peek: "+ get_second_peek(P_clone));
                     }
                 } else {
                     System.out.println("not shorter!!");
                 }
             } else {
                 if (lineLineSegIntersection(q_rotation, c, P_clone.peek(), get_second_peek(P_clone)) == true
-                        && visibleAngle(Vis_temp.peek(), c, get_second_peek(P_clone))
+                        && (visibleAngle(Vis_temp.peek(), c, get_second_peek(P_clone)) || visibleAngle(Vis_temp.peek(), c, P_clone.peek()))
                         && visibleAngle(P_clone.peek(), c, get_second_peek(P_clone))) {
                     System.out.println("intersection found");
 //                GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(P_temp.peek(), get_second_peek(P_temp)));
@@ -466,8 +484,12 @@ public class Beta_Visibility_Brute extends VisPolygon {
                         System.out.println("range shorter!!" + inRange(q_rotation, temp_intersect));
                         min_range = inRange(q_rotation, temp_intersect);
                         intersect_v = temp_intersect;
-                        GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(P_temp.peek(), get_second_peek(P_temp)));
+//                        GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(P_temp.peek(), get_second_peek(P_temp)));
                     } else {
+                        System.out.println("line intersect: " + (lineLineSegIntersection(q_rotation, c, P_clone.peek(), get_second_peek(P_clone)) == true));
+                        System.out.println("visible angle between vistemp: " + (visibleAngle(Vis_temp.peek(), c, get_second_peek(P_clone)) || visibleAngle(Vis_temp.peek(), c, P_clone.peek())));
+                        System.out.println("visible angle between c and edgepoints: " + visibleAngle(P_clone.peek(), c, get_second_peek(P_clone)));
+                        System.out.println("line intersect: " + (lineLineSegIntersection(q_rotation, c, P_clone.peek(), get_second_peek(P_clone)) == true));
                         System.out.println("not shorter!!");
                     }
                 }
@@ -494,21 +516,12 @@ public class Beta_Visibility_Brute extends VisPolygon {
             System.out.println("in cycleintersectloop");
         }
 
-//        while (lineLineSegIntersection(P_temp.peek(), get_second_peek(P_temp), v_intersect_norm[0], v_intersect_norm[1]) == false) {
-//            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(P_temp.peek(), get_second_peek(P_temp)));
-//            P_temp.pop();
-//            v_intersect_norm = getPointsOnNormal(P_temp.peek(), get_second_peek(P_temp), intersect_v);
-//            System.out.println("in cycleintersectloop");
-//        }
-
-        System.out.println("p.temp: " + P_temp.peek());
     }
 
     protected Stack<Point> getPartPolygonRight( Stack<Point> P_temp,  Stack<Point> Vis_temp){
         Stack<Point> temp = new Stack<>();
 
         while (P_temp.peek() != get_second_peek(Vis_temp)) {
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P_temp.peek())).setFill(Color.BLUE);
             System.out.println("P_clone: " + P_temp.peek());
             temp.push(P_temp.pop());
         }
@@ -520,9 +533,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         Stack<Point> temp = new Stack<>();
 
         while (P_temp.size() != 0 && P_temp.peek() != get_second_peek(Vis_temp)) {
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P_temp.peek())).setFill(Color.BLUE);
             System.out.println("P_clone: " + P_temp.peek());
-//            get_second_peek(P_temp).setPredecessor(P_temp.peek());
             temp.push(P_temp.pop());
         }
 
@@ -542,7 +553,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         Stack<Point> P_rec = new Stack<>();
 
 
-        Point c_innerturn = get_second_peek(Vis_temp);
+        Point c_innerturn = Vis_temp.peek().getCorner();
         Point c_innerturn_prev = c_innerturn.getPredecessor();
         System.out.println("c inner turn: " + c_innerturn);
         System.out.println("predecessor: "+ c_innerturn_prev);
@@ -558,12 +569,24 @@ public class Beta_Visibility_Brute extends VisPolygon {
         System.out.println("c predecessor: " +  c_innerturn_prev);
         System.out.println();
 
+        if (q != GUI.polygon.get_q()) {
+            Point q_parent = q.getTreeParent();
+            System.out.println("q_parent:" + q_parent);
+            Point prev_end = simulateRayEndPoint(q_parent, q);
+            System.out.println("old beta :" + beta);
+
+            beta = beta - Math.abs(checkAngle(prev_end, q, c_innerturn));
+//            GUI.betapolygonscene.getChildren().add(createEdgeFromPointsBlue(prev_end, q));
+//            GUI.betapolygonscene.getChildren().add(createEdgeFromPoints(q, c_outerturn));
+            System.out.println("new beta set:" + beta);
+        }
+
 
         if (alpha > beta) {
 
             //predecessor is q, so that we get the artificial edge
 
-            c_innerturn.setPredecessor(q);
+//            c_innerturn.setPredecessor(q);
             Point Vis_peek = Vis_temp.pop();
             c_innerturn.setSuccessor(get_second_peek(Vis_temp));
             Vis_temp.push(Vis_peek);
@@ -586,7 +609,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         } else if (alpha <= beta) {
 
             //predecessor is q, so that we get the artificial edge
-            c_innerturn.setPredecessor(q);
+//            c_innerturn.setPredecessor(q);
             c_innerturn.setSuccessor(P_temp.peek());
             c_innerturn.setTreeParent(q);
             q.setTreeChild(c_innerturn);
@@ -595,7 +618,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
 //            B_vis.push(P_temp.pop());
 //            Point intersect_v = caveIntersectRotate(P_temp, 0, q, c_outerturn, get_second_peek(Vis_temp));
 //            P_temp.push(B_vis.pop());
-            recursivePolygonVisibility(P_temp, B_vis, Vis_temp, beta, c_innerturn, Vis_temp.peek(), "left");
+            recursivePolygonVisibilityLeft(P_temp, B_vis, Vis_temp, beta, c_innerturn,Vis_temp.peek(), "left");
         }
 
 
@@ -608,7 +631,7 @@ public class Beta_Visibility_Brute extends VisPolygon {
         //gets Points until intersection Point
         while (P_temp.peek() != intersect_v.getSuccessor()) {
             System.out.println("P_clone: " + P_temp.peek());
-            get_second_peek(P_temp).setPredecessor(P_temp.peek());
+//            get_second_peek(P_temp).setPredecessor(P_temp.peek());
             temp.push(P_temp.pop());
         }
 
@@ -618,7 +641,12 @@ public class Beta_Visibility_Brute extends VisPolygon {
         //deletes all Points until inner corner Point
         while (P_temp.peek() != get_second_peek(Vis_temp)) {
             System.out.println("P_clone: " + P_temp.peek());
-            get_second_peek(P_temp).setPredecessor(P_temp.peek());
+//            try{
+//                get_second_peek(P_temp).setPredecessor(P_temp.peek());
+//            }catch (Exception e){
+//                System.out.println("Error in set predecessor linkage");
+//            }
+
             P_temp.pop();
         }
 
@@ -626,15 +654,16 @@ public class Beta_Visibility_Brute extends VisPolygon {
     }
 
 
-    protected Stack<Point> getWholePolygonLeft(Stack<Point> P_temp, Stack<Point> Vis_temp) {
+    protected Stack<Point> getWholePolygonLeft(Stack<Point> P_temp, Stack<Point> Vis_temp, Point c_innerturn) {
 
         Stack<Point> P_rec = new Stack<>();
         Point end = Vis_temp.peek();
 
+
         P_rec.push(end);
 
-        while (P_temp.peek() != get_second_peek(Vis_temp)) {
-            get_second_peek(P_temp).setPredecessor(P_temp.peek());
+        while (P_temp.peek() != c_innerturn) {
+//            get_second_peek(P_temp).setPredecessor(P_temp.peek());
             P_rec.push(P_temp.pop());
         }
 
@@ -669,6 +698,9 @@ public class Beta_Visibility_Brute extends VisPolygon {
         System.out.println("VIs_temp peek in REC VISIBILITY: " + Vis_temp.peek());
         System.out.println("TEMP PRINTED");
         printStackordertoPolygon(temp);
+        Point c_innerturn = end.getCorner();
+        System.out.println("c_innerturn:"+ c_innerturn);
+        Point c_innerturn_prev = c_innerturn.getPredecessor();
 
         if (temp.size() == 0) {
 
@@ -686,8 +718,12 @@ public class Beta_Visibility_Brute extends VisPolygon {
             if( direction == "left"){
 
                 temp.push(intersect_v);
-                temp.push(get_second_peek(Vis_temp).getPredecessor());
-                temp.push(get_second_peek(Vis_temp));
+
+//                temp.push(get_second_peek(Vis_temp).getPredecessor());
+//                temp.push(get_second_peek(Vis_temp));
+
+                temp.push(c_innerturn_prev);
+                temp.push(c_innerturn);
 
 
 
@@ -710,8 +746,8 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
             B_vis.peek().setLocalBeta(beta);
 
-            Vis_rec.push(get_second_peek(Vis_temp).getPredecessor());
-            Vis_rec.push(get_second_peek(Vis_temp));
+            Vis_rec.push(c_innerturn_prev);
+            Vis_rec.push(c_innerturn);
 
             System.out.println("P_rec before vispolygon: ");
             printStackordertoPolygon(P_rec);
@@ -727,10 +763,10 @@ public class Beta_Visibility_Brute extends VisPolygon {
             System.out.println("q: " + q);
             algorithm_default(temp, Vis_rec, q);
 
-            P_rec.remove(get_second_peek(Vis_temp));
-            Vis_rec.remove(get_second_peek(Vis_temp));
-            P_rec.remove(get_second_peek(Vis_temp).getPredecessor());
-            Vis_rec.remove(get_second_peek(Vis_temp).getPredecessor());
+            P_rec.remove(c_innerturn);
+            Vis_rec.remove(c_innerturn);
+            P_rec.remove(c_innerturn_prev);
+            Vis_rec.remove(c_innerturn_prev);
 
 
 
@@ -754,14 +790,104 @@ public class Beta_Visibility_Brute extends VisPolygon {
             Vis_temp.pop();
 
 
+
+
             System.out.println("after loop");
             System.out.println("after loop");
             System.out.println("P Peek after loop: "+ P_temp.peek());
             System.out.println("Vis Peek after loop: "+ Vis_temp.peek());
-            printStackordertoPolygon(B_vis);
 
 
         }
+    }
+
+
+    protected void recursivePolygonVisibilityLeft(Stack<Point> P_temp, Stack<Point> B_vis, Stack<Point> Vis_temp, double beta, Point q ,Point end, String direction) {
+
+        Stack<Point> temp = new Stack<>();
+        Stack<Point> P_rec = new Stack<>();
+        Stack<Point> Vis_rec = new Stack<>();
+
+
+        System.out.println("B_vispeek: " + B_vis.peek());
+        System.out.println("q in recursivepolygonvis: " + q);
+        System.out.println("end: " + end);
+
+
+       if (direction == "left") {
+
+            //construct polygon for recursive visibility
+
+            temp = getWholePolygonLeft(P_temp, Vis_temp, q);
+
+        }
+
+
+       temp.push(get_second_peek(Vis_temp));
+//        Collections.rotate(temp, 1);
+        Collections.reverse(temp);
+        printStackordertoPolygon(temp);
+        System.out.println("stop");
+
+        P_rec = (Stack<Point>) temp.clone();
+
+
+        B_vis.peek().setLocalBeta(beta);
+
+        Vis_rec.push(get_second_peek(Vis_temp).getPredecessor());
+        Vis_rec.push(get_second_peek(Vis_temp));
+
+        System.out.println("P_rec before vispolygon: ");
+        printStackordertoPolygon(P_rec);
+        System.out.println("first element before vispolygon: ");
+        System.out.println(P_rec.peek());
+
+        System.out.println("Vis_rec before vispolygon: ");
+        printStackordertoPolygon(Vis_rec);
+        System.out.println("first element before vispolygon: ");
+        System.out.println(Vis_rec.peek());
+
+
+        System.out.println("q: " + q);
+        algorithm_default(temp, Vis_rec, q);
+
+        P_rec.remove(get_second_peek(Vis_temp));
+        Vis_rec.remove(get_second_peek(Vis_temp));
+        System.out.println("TRYIN TO DELETE VISPOLYGYON SECOND PREDECESSOR: "+ get_second_peek(Vis_temp).getPredecessor());
+//        P_rec.remove(get_second_peek(Vis_temp).getPredecessor());
+        Vis_rec.remove(get_second_peek(Vis_temp).getPredecessor());
+//        Vis_rec.remove(get_second_peek(Vis_temp).getPredecessor());
+
+
+
+
+        Collections.reverse(Vis_rec);
+
+
+        System.out.println("P_rec: ");
+        printStackordertoPolygon(P_rec);
+        System.out.println("first element: ");
+        System.out.println(P_rec.peek());
+
+        System.out.println("Vis_rec: ");
+        printStackordertoPolygon(Vis_rec);
+        System.out.println("first element: ");
+        System.out.println(Vis_rec.peek());
+
+        //cycle polygon with new query Point q
+        polygonCycle(P_rec, Vis_rec, beta, q);
+
+        //delete Vis_temp pop as artefact, it is already included
+        Vis_temp.pop();
+        B_vis.push(Vis_temp.peek().getPredecessor());
+
+
+        System.out.println("after loop");
+        System.out.println("after loop");
+        System.out.println("P Peek after loop: "+ P_temp.peek());
+        System.out.println("Vis Peek after loop: "+ Vis_temp.peek());
+        printStackordertoPolygon(B_vis);
+
     }
 
 

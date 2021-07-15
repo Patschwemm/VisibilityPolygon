@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Point extends Circle {
 
     private Point pointLinked;
-    private boolean corner;
+    private Point corner;
     private Point successor;
     private double local_beta;
     private Point predecc;
@@ -15,12 +15,14 @@ public class Point extends Circle {
     private ArrayList<Point> childs;
     private Point child;
     private Point parent;
+    private Point intersect_v;
 
 
     public Point() {
         super();
         this.pointLinked = null;
-        this.corner = false;
+        this.corner = null;
+        this.intersect_v = null;
         this.successor = null;
         this.local_beta = 0;
         this.predecc = null;
@@ -112,13 +114,23 @@ public class Point extends Circle {
     // for VisPolygon
     // ----------------------------------------------------------------------------------------------------------------
 
-    public void setCorner() {
-        corner = true;
+    public void setCorner(Point corner) {
+        this.corner = corner;
     }
 
-    public boolean isCorner() {
+    public Point getCorner() {
         return corner;
     }
+
+    public void setIntersect(Point intersect_v) {
+        this.intersect_v = intersect_v;
+    }
+
+    public Point getIntersect() {
+        return intersect_v;
+    }
+
+
 
     public Point getPointLinked() {
         return this.pointLinked;

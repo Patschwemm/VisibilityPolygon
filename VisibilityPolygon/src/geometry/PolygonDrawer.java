@@ -281,28 +281,23 @@ public class PolygonDrawer {
 
     public void draw_custom_polygon(){
 
-//        GUI.polygon.addNode(560.0,214.0);
-//        GUI.polygon.addNode(528.0,341.0);
-//        GUI.polygon.addNode(834.0,356.0);
-//        GUI.polygon.addNode(770.0,440.0);
-//        GUI.polygon.addNode(538.0,458.0);
-//        GUI.polygon.addNode(463.0,594.0);
-//        GUI.polygon.addNode(1063.0,613.0);
-//        GUI.polygon.addNode(1067.0,208.0);
-//        GUI.polygon.addNode(562.0,201.0);
+        GUI.polygon.addNode(1040.0,714.9999999999999);
+        GUI.polygon.addNode(1040.0,145.0);
+        GUI.polygon.addNode(210.0,145.0);
+        GUI.polygon.addNode(210.0,705.0);
+        GUI.polygon.addNode(830.0,705.0);
+        GUI.polygon.addNode(830.0,290.0);
+        GUI.polygon.addNode(420.0,290.0);
+        GUI.polygon.addNode(420.0,560.0);
+        GUI.polygon.addNode(620.0,560.0);
+        GUI.polygon.addNode(620.0,425.0);
+        GUI.polygon.addNode(630.0,425.0);
+        GUI.polygon.addNode(630.0,570.0);
+        GUI.polygon.addNode(410.0,570.0);
+        GUI.polygon.addNode(410.0,280.0);
+        GUI.polygon.addNode(840.0,280.0);
+        GUI.polygon.addNode(840.0,715.0);
 
-        GUI.polygon.addNode(1130.0,575.0);
-        GUI.polygon.addNode(1097.0,333.0);
-        GUI.polygon.addNode(912.0,159.0);
-        GUI.polygon.addNode(592.0,131.0);
-        GUI.polygon.addNode(290.0,177.0);
-        GUI.polygon.addNode(171.0,403.0);
-        GUI.polygon.addNode(434.0,339.0);
-        GUI.polygon.addNode(754.0,340.0);
-        GUI.polygon.addNode(845.0,444.0);
-        GUI.polygon.addNode(791.0,562.0);
-        GUI.polygon.addNode(671.0,519.0);
-        GUI.polygon.addNode(508.0,446.0);
 
 
 

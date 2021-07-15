@@ -83,7 +83,7 @@ public class VisPolygon extends Polygon {
     private void boundaryCycle(Stack<Point> P, Stack<Point> Vis, Point q) {
         //finds the turn event for current cycle
 
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(vi_prev)).setFill(Color.YELLOW);
+//
 
         while (P.size()!= 0 && !getEvent(Vis.peek(), q, P.peek(), vi_prev, P, Vis)) {
             System.out.println("boundary cycling");
@@ -171,21 +171,18 @@ public class VisPolygon extends Polygon {
         if (inner_turn_event) {
             System.out.println("inner turn entered");
             vi_prev = Vis.peek();
-            P.peek().setCorner();
             delete_covered_points(P, Vis, q, P.peek());
             return true;
         }
 
         if (outer_left_turn_event) {
             System.out.println("outer left turn entered");
-            c.setCorner();
             fastForward(P, Vis, q, c);
             return true;
         }
 
         if (outer_right_turn_event) {
             System.out.println("outer right turn entered");
-            c.setCorner();
             forwardIntersect(P, Vis, q, c);
             return true;
         }
@@ -199,7 +196,6 @@ public class VisPolygon extends Polygon {
         Point c_prev = P.peek();
         Point c_prev_prev = get_second_peek(P);
         System.out.println("check angle1:" + checkAngle(Vis.peek(), q, P.peek()));
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.GREENYELLOW);
         update_angle_sum(Vis.peek(), q, P.peek());
         System.out.println("check angle2:" + checkAngle(P.peek(), q, get_second_peek(P)));
         update_angle_sum(P.peek(), q, get_second_peek(P));
@@ -210,7 +206,6 @@ public class VisPolygon extends Polygon {
                 if (P.size() == 1) {
                     break;
                 }
-                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
                 System.out.println("in Fast Forward Intersect while-loop");
                 System.out.println("check angle:" + checkAngle(P.peek(), q, get_second_peek(P)));
 //                linkedPoint = popLinked(P);
@@ -222,7 +217,6 @@ public class VisPolygon extends Polygon {
             }
         }
 
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GREEN);
 
         System.out.println(" °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°p.size:"+ P.size());
         System.out.println(P.peek());
@@ -236,6 +230,8 @@ public class VisPolygon extends Polygon {
         System.out.println("intersection created");
         System.out.println(intersect_v);
         intersect_v.setPointLinked(c);
+        c.setIntersect(intersect_v);
+        intersect_v.setCorner(c);
 
                         System.out.println("range: c " + inRange(q, c) + " linkp: " + inRange(q, intersect_v));
         if (inRange(q, c) >= inRange(q, intersect_v)) {
@@ -263,23 +259,17 @@ public class VisPolygon extends Polygon {
             } else {
                 //&& R.peek() != c_prev
                 while (R.size() != 0 ) {
-                    GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(R.peek())).setFill(Color.DARKTURQUOISE);
                     P.push(R.pop());
                     System.out.println("r pushing on P bakc again");
                 }
                 System.out.println("r.size: "+ R.size());
                 System.out.println("Vis.ize: "+ Vis.size());
-                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.DARKVIOLET);
-//                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKVIOLET);
-//                Vis.peek().setFill(Color.RED);
-//                GUI.pointscene.getChildren().add(Vis.peek());
                 Vis.push(c);
                 delete_covered_points(P,Vis,q,P.peek());
                 inner_turn_before = true;
             }
         } else {
             System.out.println("normal case reached");
-//            System.out.println(" euclid distance c: " + inRange(p, c) + " intersect : " + inRange(p, intersect_v));
             vi_prev = P.pop();
             Vis.push(intersect_v);
             Vis.push(P.pop());
@@ -291,15 +281,12 @@ public class VisPolygon extends Polygon {
 
     private void fastForward(Stack<Point> P, Stack<Point> Vis, Point q, Point c) {
         System.out.println("check angle:" + checkAngle(Vis.peek(), q, P.peek()));
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(Vis.peek())).setFill(Color.GRAY);
 
 
         while ((visibleAngle(P.peek(), q, Vis.peek()) == false)) {
             System.out.println("In FAST FORWARD      checkangle: " + checkAngle(P.peek(), q, get_second_peek(Vis)));
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
             vi_prev = P.pop();
         }
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.GRAY);
         inner_turn_before = true;
         delete_covered_points(P, Vis, q, P.peek());
 
@@ -310,7 +297,6 @@ public class VisPolygon extends Polygon {
         //Point as new artificial edge node point
         Point linkedPoint = null;
         Point intersect_v = new Point();
-        c.setPredecessor(Vis.peek());
 
 
         //deletes all vertices left to the vector pc
@@ -345,9 +331,6 @@ public class VisPolygon extends Polygon {
             previousPointCovered(P, Vis, q, c, linkedPoint.getPointLinked());
 
         } else {
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(Vis.peek())).setFill(Color.DARKCYAN);
-//        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(S_prev)).setFill(Color.DARKCYAN);
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
 
             //line intersection of 4 points (2 node for first edge, 2 for second edge)
             intersect_v = lineLineIntersection(q, c, Vis.peek(), get_second_peek(Vis));
@@ -356,10 +339,9 @@ public class VisPolygon extends Polygon {
 
 
             Vis.push(intersect_v);
-//            GUI.betapolygonscene.getChildren().add(createNode(intersect_v.getCenterX(),intersect_v.getCenterY()));
+            intersect_v.setCorner(c);
+            c.setIntersect(intersect_v);
             Vis.push(P.pop());
-
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(c)).setFill(Color.DARKCYAN);
 
             System.out.println("intersection created");
             inner_turn_before = true;
@@ -372,18 +354,15 @@ public class VisPolygon extends Polygon {
 
         while (lineLineSegIntersection(q, linkpoint, P.peek(), get_second_peek(P)) == false) {
             while (angle_sum_exceeded()) {
-                GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.PINK);
                 System.out.println("--------- check angle:" + checkAngle(P.peek(), q, get_second_peek(P)));
                 R.push(P.pop());
                 update_angle_sum(P.peek(), q, get_second_peek(P));
             }
             R.push(P.pop());
             System.out.println("--------- popping until intersection");
-            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.PINK);
         }
 
 
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(P.peek())).setFill(Color.PINK);
 
         //line intersection of 4 points (2 node for first edge, 2 for second edge)
         intersect_v = lineLineIntersection(q, linkpoint, P.peek(), get_second_peek(P));
@@ -404,6 +383,11 @@ public class VisPolygon extends Polygon {
 
             vi_prev = P.pop();
             intersect_v.setPointLinked(linkpoint);
+            linkpoint.setIntersect(intersect_v);
+            intersect_v.setCorner(linkpoint);
+            System.out.println("INTERSECTION PREV POINT: ");
+            System.out.println("linkpoint: "+ linkpoint);
+            System.out.println("intersect v: "+ intersect_v);
             Vis.push(intersect_v);
             reset_angle();
             inner_turn_before = false;
@@ -450,9 +434,7 @@ public class VisPolygon extends Polygon {
             }
         }
 
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(PointList.get(idx))).setFill(Color.RED);
         Vis.push(PointList.get(idx));
-        GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(PointList.get(decrementIdx(idx)))).setFill(Color.RED);
         Vis.push(PointList.get(decrementIdx(idx)));
         p_idx = decrementIdx(idx);
     }
@@ -735,16 +717,13 @@ public class VisPolygon extends Polygon {
     protected Point popLinked(Stack<Point> Stack) {
         Point point;
         point = Stack.pop();
-//        try{
-//            GUI.polygon.getPointList().get(GUI.polygon.getPointList().indexOf(point)).setFill(Color.WHITE);
-//        }catch (Exception e){
-//            System.out.println("error: "+ e);
-//        }
 
         if (point.getPointLinked() != null) {
             System.out.println("----------- Point is linked");
             return point;
         } else {
+            point.setCorner(null);
+            point.setIntersect(null);
             System.out.println("----------- Point is not linked");
             return null;
         }
@@ -806,8 +785,14 @@ public class VisPolygon extends Polygon {
         for (int i = 0; i < PointList.size(); i++) {
             P.push(List.get(p_idx));
             betavis_P.push(List.get(p_idx));
+            if(betavis_P.size() > 1){
+                get_second_peek(betavis_P).setPredecessor(betavis_P.peek());
+            }
+            System.out.println(i+ ": " + betavis_P.peek());
             p_idx = incrementIdx(p_idx);
+
         }
+        betavis_P.lastElement().setPredecessor(betavis_P.firstElement());
         System.out.println(betavis_P);
         System.out.println(P);
 

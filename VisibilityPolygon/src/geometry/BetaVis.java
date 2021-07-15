@@ -106,7 +106,7 @@ public class BetaVis extends VisPolygon {
             System.out.println("Bvis.size:" + B_vis.size());
         }
 
-        if (B_vis.peek().isCorner() == true) {
+        if (B_vis.peek().getCorner() == null) {
             System.out.println("--------------------------------------------------------------------------------");
             System.out.println("Right Cave");
             System.out.println("--------------------------------------------------------------------------------");
@@ -114,7 +114,7 @@ public class BetaVis extends VisPolygon {
             System.out.println("P.size:" + P_temp.size());
             System.out.println("Bvis.size:" + B_vis.size());
             RightCave(P_temp, B_vis, Vis_temp, beta);
-        } else if (B_vis.peek().isCorner() == false) {
+        } else if (B_vis.peek().getCorner() != null) {
             LeftCave(P_temp, B_vis, Vis_temp, beta);
         }
 //        System.out.println(P_temp.peek());
@@ -616,7 +616,6 @@ public class BetaVis extends VisPolygon {
         if (inner_turn_event) {
             System.out.println("inner turn entered");
             vi_prev = B_vis.peek();
-            P_temp.peek().setCorner();
             InnerTurnChain(beta, q, end, P_temp, B_vis, Vis_temp);
             return true;
         }
@@ -624,7 +623,6 @@ public class BetaVis extends VisPolygon {
 
         if (outer_right_turn_event) {
             System.out.println("outer right turn entered");
-            c.setCorner();
             OuterRightTurn(beta, q, end, P_temp, B_vis, Vis_temp);
             return true;
         }
@@ -711,7 +709,7 @@ public class BetaVis extends VisPolygon {
         if (inner_turn_event) {
             System.out.println("inner turn entered");
             vi_prev = B_vis.peek();
-            P_temp.peek().setCorner();
+
             InnerTurnChain(beta, q, end, P_temp, B_vis, Vis_temp);
             return true;
         }
@@ -719,7 +717,7 @@ public class BetaVis extends VisPolygon {
 
         if (outer_right_turn_event) {
             System.out.println("outer right turn entered");
-            c.setCorner();
+
             OuterRightTurn(beta, q, end, P_temp, B_vis, Vis_temp);
             return true;
         }
@@ -782,7 +780,7 @@ public class BetaVis extends VisPolygon {
         if (inner_turn_event_inverse) {
             System.out.println("inner turn entered");
             vi_prev = B_vis.peek();
-            P.peek().setCorner();
+
             InnerTurnChain(beta, q, end, P, B_vis, Vis_temp);
             return true;
         }
@@ -790,7 +788,7 @@ public class BetaVis extends VisPolygon {
         //exchange outer turn event with inner turn event
         if (outer_right_turn_event_inverse) {
             System.out.println("outer right turn entered");
-            c.setCorner();
+
             OuterRightTurn(beta, q, end, P, B_vis, Vis_temp);
             return true;
         }
