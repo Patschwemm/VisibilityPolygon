@@ -84,7 +84,7 @@ public class Settings {
                 if(GUI.vis_q!= null) { GUI.vis_q.deleteVisPolygon();}
                 vis_q_status.setSelected(false);
                 if(GUI.vis_q.betavis == true){
-                    GUI.betavis_q.deleteBetaVisPolygon();
+                    GUI.betavis_q_rec.deleteBetaVisPolygon();
                     GUI.vis_q.betavis = false;
                     beta.valueProperty().setValue(0);
                 }
@@ -93,9 +93,6 @@ public class Settings {
         addButton("Point Nodes", delnode);
 
 
-
-        CheckBox hidenode = new CheckBox();
-        addCheckBox("Hide Node", hidenode);
 
         // ----------------------------------------------------------------------------------------------------------
         // Polygon Options
@@ -117,6 +114,8 @@ public class Settings {
                     geometry.EventHandler.clicks = 0;
                     geometry.EventHandler.p_moving = false;
                     GUI.polygonscene.getChildren().clear();
+                    GUI.betavis_q_rec.deleteBetaVisPolygon();
+                    beta.valueProperty().setValue(0);
                 }
             }
         });
@@ -267,6 +266,16 @@ public class Settings {
             }
         });
         addButton("Custom Polygon", draw_custom_polygon);
+
+        Button draw_custom_polygon2 = new Button("Draw");
+        draw_custom_polygon2.setFont(font);
+        draw_custom_polygon2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                drawer.draw_custom_polygon2();
+            }
+        });
+        addButton("Custom Polygon Nr. 2", draw_custom_polygon2);
 
         return gp;
     }

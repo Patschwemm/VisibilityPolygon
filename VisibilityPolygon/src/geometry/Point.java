@@ -10,12 +10,12 @@ public class Point extends Circle {
     private Point corner;
     private Point successor;
     private double local_beta;
-    private Point predecc;
+    private Point predec;
     private Point linkedtocorner;
     private ArrayList<Point> childs;
-    private Point child;
     private Point parent;
     private Point intersect_v;
+    private boolean inner_turn_corner;
 
 
     public Point() {
@@ -25,11 +25,11 @@ public class Point extends Circle {
         this.intersect_v = null;
         this.successor = null;
         this.local_beta = 0;
-        this.predecc = null;
+        this.predec = null;
         this.linkedtocorner = null;
         this.childs = new ArrayList<>();
-        this.child = null;
         this.parent = null;
+        this.inner_turn_corner = false;
     }
 
 
@@ -38,21 +38,19 @@ public class Point extends Circle {
     // ----------------------------------------------------------------------------------------------------------------
 
 
-    //setIntersectLink(Point $v$) & Verknüpft Eckpunkt $c$ mit Schnittpunkt $s$ \\
-    //getIntersectLink() & Gibt entweder Punkt $c$ oder Punkt $s$ zurück\\
-    //setCorner()  & Setzt eine Boolean für Eckpunkt $c$  \\
-    //isCorner() & Gibt wieder ob der aktuelle Punkt $v$ auch ein Eckpunkt $c$ ist \\
-    //link(Point $v$)& Verknüpft einen beliebigen Punkt mit $v$  \\
-    //getlink() &  Gibt $v$ als verknüpften Punkt wieder \\
-    //setSucc(Point $v$) & Setzt Verknüpfung zu dem vorherigen Nachbarpunkt  \\
-    //getSucc() & Gibt den vorherigen Nachbarpunkt wieder \\
-    //setPredec(Point $v$)& Setzt Verknüpfung zu dem nachfolgnden Nachbarpunkt  \\
-    //getPredecc()& Gibt den nachfolgenden Nachbarpunkt wieder \\
-    //setBeta(Float $\beta$)&  Gibt für einen $\beta$-sichtbaren Eckpunkt das restliche $\beta$ wieder\\
-    //setParent(Point $c$)& Setzt den Elternknoten im Rekursionsbaum  \\
-    //getParent() & Gibt den Elternknoten aus \\
-    //setChild(Point $c$)& Setzt einen Kindknoten im Rekursionsbaum \\
-    //getChild() & Gibt die Kindknoten aus \\
+    //setIntersect(Point $v$) & Verknüpft Eckpunkt $c$ mit Schnittpunkt $s$ \\
+    //getIntersect() & Gibt Punkt $s$ zurück\\
+    //setCorner()  & Setzt enen Eckpunkt $c$ für Schnittpunkt s \\
+    //getCorner() & gibt den Eckpunkt $c$ für Schnittpunkt s aus \\
+    //setSuccessor(Point $v$) & Setzt Verknüpfung zu dem vorherigen Nachbarpunkt  \\
+    //getSuccessor() & Gibt den vorherigen Nachbarpunkt wieder \\
+    //setPredecessor(Point $v$)& Setzt Verknüpfung zu dem nachfolgnden Nachbarpunkt  \\
+    //getPredecessor()& Gibt den nachfolgenden Nachbarpunkt wieder \\
+    //setLocalBeta(Float $\beta$)&  Gibt für einen $\beta$-sichtbaren Eckpunkt das restliche $\beta$ wieder\\
+    //setTreeParent(Point $c$)& Setzt den Elternknoten im Rekursionsbaum  \\
+    //getTreeParent() & Gibt den Elternknoten aus \\
+    //setTreeChild(Point $c$)& Setzt einen Kindknoten im Rekursionsbaum \\
+    //getTreeChild() & Gibt die Kindknoten aus \\
 
     public void setTreeChild(Point Child) {
         childs.add(Child);
@@ -70,14 +68,6 @@ public class Point extends Circle {
         return this.parent;
     }
 
-    public Point getLinkedtocorner() {
-        return linkedtocorner;
-    }
-
-    public void setLinkedtocorner(Point linkedtocorner) {
-        this.linkedtocorner = linkedtocorner;
-    }
-
     public double getLocalBeta() {
         return this.local_beta;
     }
@@ -90,8 +80,8 @@ public class Point extends Circle {
         this.successor = successor;
     }
 
-    public void setPredecessor(Point predecc) {
-        this.predecc = predecc;
+    public void setPredecessor(Point predec) {
+        this.predec = predec;
     }
 
     public Point getSuccessor() {
@@ -99,20 +89,8 @@ public class Point extends Circle {
     }
 
     public Point getPredecessor() {
-        return predecc;
+        return predec;
     }
-
-    public void clearBetaLinkage(){
-        this.successor = null;
-        this.local_beta = 0;
-        this.predecc = null;
-        this.childs.clear();
-        this.child = null;
-        this.parent = null;
-    }
-    // ----------------------------------------------------------------------------------------------------------------
-    // for VisPolygon
-    // ----------------------------------------------------------------------------------------------------------------
 
     public void setCorner(Point corner) {
         this.corner = corner;
@@ -129,6 +107,25 @@ public class Point extends Circle {
     public Point getIntersect() {
         return intersect_v;
     }
+
+    public boolean isInner_turn_corner() {
+        return inner_turn_corner;
+    }
+
+    public void setInner_turn_corner(boolean inner_turn_corner) {
+        this.inner_turn_corner = inner_turn_corner;
+    }
+
+    public void clearBetaLinkage(){
+        this.successor = null;
+        this.local_beta = 0;
+        this.predec = null;
+        this.childs.clear();
+        this.parent = null;
+    }
+    // ----------------------------------------------------------------------------------------------------------------
+    // for VisPolygon
+    // ----------------------------------------------------------------------------------------------------------------
 
 
 

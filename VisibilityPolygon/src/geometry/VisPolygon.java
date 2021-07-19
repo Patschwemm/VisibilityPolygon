@@ -29,7 +29,6 @@ public class VisPolygon extends Polygon {
         super();
 
         //check if Polygon is given and p point for visibility is given
-        System.out.println("precondition" + GUI.betavis_q);
         if (GUI.polygon.getPolygonDrawn() && GUI.polygon.is_q_set() && betavis == false) {
 
             // preprocessing
@@ -168,6 +167,8 @@ public class VisPolygon extends Polygon {
         }
 
         System.out.println("angle: " + angle + " prev_angle: " + prev_angle);
+        System.out.println("inner turn: "+ inner_turn_event);
+        System.out.println("visibleAngle(c, q, v2) "+ visibleAngle(c, q, v2));
         if (inner_turn_event) {
             System.out.println("inner turn entered");
             vi_prev = Vis.peek();
@@ -270,9 +271,15 @@ public class VisPolygon extends Polygon {
             }
         } else {
             System.out.println("normal case reached");
+            intersect_v.setPredecessor(P.peek());
+            intersect_v.setSuccessor(get_second_peek(P));
+            c.setInner_turn_corner(false);
+            System.out.println("POPPED PEEK:"+ P.peek());
             vi_prev = P.pop();
             Vis.push(intersect_v);
+            System.out.println("POPPED 2nd PEEK:"+ P.peek());
             Vis.push(P.pop());
+            System.out.println("");
             inner_turn_before = false;
         }
         reset_angle();
@@ -307,9 +314,11 @@ public class VisPolygon extends Polygon {
             if (linkedPoint == null){
                 linkedPoint = popLinked(Vis);
             } else {
+                System.out.println("in range argument: "+ (inRange(q, c) > inRange(q, linkedPoint.getPointLinked()) ));
                 if ( linkedPoint.getPointLinked() == null){
                     linkedPoint = popLinked(Vis);
                 } else if (inRange(q, c) > inRange(q, linkedPoint.getPointLinked() )){
+                    System.out.println("IN BREAK");
                     break;
                 }else {
                     linkedPoint = popLinked(Vis);
@@ -317,16 +326,28 @@ public class VisPolygon extends Polygon {
             }
             if (linkedPoint != null
                     && linkedPoint.getPointLinked() != null
-                    && inRange(q, c) > inRange(q, linkedPoint.getPointLinked())) {
+                    && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
+            || visibleAngle(c,q,linkedPoint.getPointLinked()))){
 
             }
+        }
+
+        try {
+            System.out.println("in range argument: "+ inRange(q, c) +" "+ inRange(q, linkedPoint.getPointLinked() ));
+            System.out.println("Linkpoint "+ linkedPoint);
+            System.out.println("get linked point" + linkedPoint.getPointLinked());
+            System.out.println("checkangle: "+ visibleAngle(c,q,linkedPoint.getPointLinked()));
+        }catch (Exception e){
+            System.out.println("error in deletecovered at linkpoint argument");
         }
 
 
 
         if (linkedPoint != null
                 && linkedPoint.getPointLinked() != null
-                && inRange(q, c) > inRange(q, linkedPoint.getPointLinked())) {
+                && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
+                || visibleAngle(c,q,linkedPoint.getPointLinked()))){
+            System.out.println("checkangle: "+ visibleAngle(c,q,linkedPoint.getPointLinked()));
             System.out.println("range: c " + inRange(q, c) + " linkp: " + inRange(q, linkedPoint));
             previousPointCovered(P, Vis, q, c, linkedPoint.getPointLinked());
 
@@ -334,6 +355,8 @@ public class VisPolygon extends Polygon {
 
             //line intersection of 4 points (2 node for first edge, 2 for second edge)
             intersect_v = lineLineIntersection(q, c, Vis.peek(), get_second_peek(Vis));
+            intersect_v.setPredecessor(get_second_peek(Vis));
+            intersect_v.setSuccessor(Vis.peek());
             Vis.pop();
 
 
@@ -341,6 +364,7 @@ public class VisPolygon extends Polygon {
             Vis.push(intersect_v);
             intersect_v.setCorner(c);
             c.setIntersect(intersect_v);
+            c.setInner_turn_corner(true);
             Vis.push(P.pop());
 
             System.out.println("intersection created");
@@ -380,11 +404,14 @@ public class VisPolygon extends Polygon {
 
             System.out.println("intersection with linked point created");
 
+            intersect_v.setPredecessor(P.peek());
+            intersect_v.setSuccessor(get_second_peek(P));
 
             vi_prev = P.pop();
             intersect_v.setPointLinked(linkpoint);
             linkpoint.setIntersect(intersect_v);
             intersect_v.setCorner(linkpoint);
+            linkpoint.setInner_turn_corner(false);
             System.out.println("INTERSECTION PREV POINT: ");
             System.out.println("linkpoint: "+ linkpoint);
             System.out.println("intersect v: "+ intersect_v);

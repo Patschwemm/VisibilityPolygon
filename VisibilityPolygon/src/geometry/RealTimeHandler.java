@@ -14,7 +14,7 @@ public class RealTimeHandler implements javafx.event.EventHandler<MouseEvent> {
             GUI.polygon.move_q(mouseEvent.getSceneX(), mouseEvent.getSceneY());
                 if( Settings.get().get_vis_q_Status().isSelected()){
                     GUI.vis_q.deleteVisPolygon();
-                    GUI.polygon.colorBlack();
+//                    GUI.polygon.colorBlack();
                     GUI.vis_q = new VisPolygon();
                 }
         }

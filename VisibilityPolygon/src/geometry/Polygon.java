@@ -190,14 +190,9 @@ public class Polygon {
         return this.is_q_set;
     }
 
-    public void setPointList(ArrayList<Point> pointList) {
-        this.PointList = pointList;
-    }
-
     public ArrayList<Point> getPointList() {
         return PointList;
     }
-
 
     public Point get_q() {
         return this.q;
