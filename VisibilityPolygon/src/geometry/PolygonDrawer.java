@@ -347,5 +347,50 @@ public class PolygonDrawer {
         GUI.polygon.addNode(1125.0,243.0);
         GUI.polygon.addNode(980.0,143.0);
         GUI.polygon.addNode(789.0,138.0);
+
+//        GUI.polygon.addNode(536.0,260.0);
+//        GUI.polygon.addNode(605.0,381.0);
+//        GUI.polygon.addNode(623.0,516.0);
+//        GUI.polygon.addNode(604.0,613.0);
+//        GUI.polygon.addNode(563.0,678.0);
+//        GUI.polygon.addNode(492.0,711.0);
+//        GUI.polygon.addNode(417.0,727.0);
+//        GUI.polygon.addNode(325.0,726.0);
+//        GUI.polygon.addNode(261.0,715.0);
+//        GUI.polygon.addNode(193.0,666.0);
+//        GUI.polygon.addNode(190.0,661.0);
+//        GUI.polygon.addNode(174.0,593.0);
+//        GUI.polygon.addNode(142.0,541.0);
+//        GUI.polygon.addNode(132.0,670.0);
+//        GUI.polygon.addNode(180.0,756.0);
+//        GUI.polygon.addNode(300.0,779.0);
+//        GUI.polygon.addNode(570.0,780.0);
+//        GUI.polygon.addNode(781.0,750.0);
+//        GUI.polygon.addNode(836.0,403.0);
+//        GUI.polygon.addNode(826.0,242.0);
+//        GUI.polygon.addNode(1050.0,153.0);
+//        GUI.polygon.addNode(1036.0,510.0);
+//        GUI.polygon.addNode(983.0,833.0);
+//        GUI.polygon.addNode(1215.0,818.0);
+//        GUI.polygon.addNode(1184.0,41.0);
+//        GUI.polygon.addNode(82.0,83.0);
+//        GUI.polygon.addNode(83.0,273.0);
+//        GUI.polygon.addNode(117.0,454.0);
+//        GUI.polygon.addNode(345.0,618.0);
+//        GUI.polygon.addNode(492.0,628.0);
+//        GUI.polygon.addNode(493.0,563.0);
+//        GUI.polygon.addNode(272.0,497.0);
+//        GUI.polygon.addNode(191.0,309.0);
+//        GUI.polygon.addNode(265.0,203.0);
+//        GUI.polygon.addNode(416.0,268.0);
+//        GUI.polygon.addNode(443.0,402.0);
+//        GUI.polygon.addNode(520.0,393.0);
+//        GUI.polygon.addNode(534.0,255.0);
+
+
+
+
+
+
     }
 }

@@ -24,6 +24,7 @@ public class Point extends Circle {
         this.corner = null;
         this.intersect_v = null;
         this.successor = null;
+        this.predec = null;
         this.local_beta = 0;
         this.predec = null;
         this.linkedtocorner = null;
@@ -38,84 +39,88 @@ public class Point extends Circle {
     // ----------------------------------------------------------------------------------------------------------------
 
 
-    //setIntersect(Point $v$) & Verknüpft Eckpunkt $c$ mit Schnittpunkt $s$ \\
-    //getIntersect() & Gibt Punkt $s$ zurück\\
-    //setCorner()  & Setzt enen Eckpunkt $c$ für Schnittpunkt s \\
-    //getCorner() & gibt den Eckpunkt $c$ für Schnittpunkt s aus \\
-    //setSuccessor(Point $v$) & Setzt Verknüpfung zu dem vorherigen Nachbarpunkt  \\
-    //getSuccessor() & Gibt den vorherigen Nachbarpunkt wieder \\
-    //setPredecessor(Point $v$)& Setzt Verknüpfung zu dem nachfolgnden Nachbarpunkt  \\
-    //getPredecessor()& Gibt den nachfolgenden Nachbarpunkt wieder \\
-    //setLocalBeta(Float $\beta$)&  Gibt für einen $\beta$-sichtbaren Eckpunkt das restliche $\beta$ wieder\\
-    //setTreeParent(Point $c$)& Setzt den Elternknoten im Rekursionsbaum  \\
-    //getTreeParent() & Gibt den Elternknoten aus \\
-    //setTreeChild(Point $c$)& Setzt einen Kindknoten im Rekursionsbaum \\
-    //getTreeChild() & Gibt die Kindknoten aus \\
 
+    //adds a tree child to this point
     public void setTreeChild(Point Child) {
         childs.add(Child);
     }
 
+    //returns the child list
     public ArrayList<Point> getTreeChild() {
         return childs;
     }
 
+    //sets a tree parent to this corner
     public void setTreeParent(Point Parent) {
         this.parent = Parent;
     }
 
+    //gets the tree parent of this corner
     public Point getTreeParent() {
         return this.parent;
     }
 
+    //gets the current beta on this corner
     public double getLocalBeta() {
         return this.local_beta;
     }
 
+    //sets the current beta of this corner
     public void setLocalBeta(double local_beta) {
         this.local_beta = local_beta;
     }
 
+    //sets the following point
     public void setSuccessor(Point successor) {
         this.successor = successor;
     }
 
+    //sets the previous point
     public void setPredecessor(Point predec) {
         this.predec = predec;
     }
 
+    //gets the following points
     public Point getSuccessor() {
         return successor;
     }
 
+    //gets the previous point
     public Point getPredecessor() {
         return predec;
     }
 
+    //gets the corner if this point is an intersection of the boundary and a corner
     public void setCorner(Point corner) {
         this.corner = corner;
     }
 
+    //gets the corner if this point is an intersection of the boundary and a corner
     public Point getCorner() {
         return corner;
     }
 
+    //sets the intersection of a corner and boundary if this point is a corner
     public void setIntersect(Point intersect_v) {
         this.intersect_v = intersect_v;
     }
 
+    //gets the intersection of a corner and boundy if this point is a corner
     public Point getIntersect() {
         return intersect_v;
     }
 
+    //returns if this corner is an inner corner
     public boolean isInner_turn_corner() {
         return inner_turn_corner;
     }
 
+    //sets this corner as an inner corner
     public void setInner_turn_corner(boolean inner_turn_corner) {
         this.inner_turn_corner = inner_turn_corner;
     }
 
+    //clears all linkages
     public void clearBetaLinkage(){
         this.successor = null;
         this.local_beta = 0;
@@ -123,16 +128,19 @@ public class Point extends Circle {
         this.childs.clear();
         this.parent = null;
     }
+
+
     // ----------------------------------------------------------------------------------------------------------------
     // for VisPolygon
     // ----------------------------------------------------------------------------------------------------------------
 
 
-
+    //gets the point linked as intersection or corner
     public Point getPointLinked() {
         return this.pointLinked;
     }
 
+    //sets the point linked as intersection or corner
     public void setPointLinked(Point Pointlinked) {
         this.pointLinked = Pointlinked;
     }

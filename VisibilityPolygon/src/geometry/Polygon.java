@@ -17,6 +17,7 @@ public class Polygon {
 
 
 
+    // adds a node to the polygon whose edge to the previous node doesnt intersect the polygon
     public void addNode(double x, double y) {
 
         Point point = this.createNode(x, y);
@@ -60,6 +61,7 @@ public class Polygon {
     }
 
 
+    //creates a node with set radius and color
     public Point createNode(double x, double y) {
         //create new Point as Polygon node
         Point point = new Point();
@@ -72,6 +74,7 @@ public class Polygon {
         return point;
     }
 
+    //creates edge for visual purpose with set width and color
     public Line createEdge(double x1, double y1, double x2, double y2) {
         Line edge = new Line((float) x1, (float) y1, (float) x2, (float) y2);
         edge.setStrokeWidth(5);
@@ -79,18 +82,21 @@ public class Polygon {
         return edge;
     }
 
+    // for bugfix purposes highlights and edge yellow
     public Line createEdgeFromPoints(Point v, Point w){
         Line edge = createEdge(v.getCenterX(),v.getCenterY(),w.getCenterX(),w.getCenterY());
                 edge.setStroke(Color.YELLOW);
         return edge;
     }
 
+    // for bugfix purposes highlights and edge blue
     public Line createEdgeFromPointsBlue(Point v, Point w){
         Line edge = createEdge(v.getCenterX(),v.getCenterY(),w.getCenterX(),w.getCenterY());
         edge.setStroke(Color.AQUAMARINE);
         return edge;
     }
 
+    //checks the polygon for intersections of and edges
     public boolean checkPolygonIntersection(Line edge, boolean connector) {
 
         double x1 = edge.getStartX();
@@ -106,13 +112,13 @@ public class Polygon {
 
 
             if (Line2D.linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
-                System.out.println("x1: "+ x1+ "x2: "+ x2+ "x3: "+ x3+ "x4: "+ x4);
                 return false;
             }
         }
         return true;
     }
 
+    //checks if the given q is in the polygon P
     public boolean q_in_Polygon(Point q) {
 
         double total_angle = 0;
@@ -127,11 +133,13 @@ public class Polygon {
     }
 
 
+    //returns the euclid distance of two points
     public double inRange(Point c1, Point c2) {
         return ((Math.sqrt((c1.getCenterX() - c2.getCenterX()) * (c1.getCenterX() - c2.getCenterX())
                 + (c1.getCenterY() - c2.getCenterY()) * (c1.getCenterY() - c2.getCenterY()))));
     }
 
+    //deletes the polygon
     public void deletePolygon() {
         this.EdgeList.clear();
         this.PointList.clear();
@@ -151,7 +159,7 @@ public class Polygon {
         double x2 = v2.getCenterX() - p.getCenterX();
         double y2 = v2.getCenterY() - p.getCenterY();
 
-        //determinant and skalar product
+        //determinant and scalar product
         angle = Math.atan2(x2 * y1 - y2 * x1, x2 * x1 + y2 * y1) * 180 / Math.PI;
 
         return angle;
@@ -163,6 +171,7 @@ public class Polygon {
     // ------------------------------------------------------------------------------------------------
 
     //increments so that if idx = last polygon node +1 -> idx = 0, first polygo node
+    //for pointlist preprocessing
     public int incrementIdx(int idx) {
         idx++;
         idx = idx % PointList.size();
@@ -170,6 +179,7 @@ public class Polygon {
     }
 
     //increments so that if idx = 0, first polygon node -> idx = last polygon node
+    //for pointlist preprocessing
     public int decrementIdx(int idx) {
         idx--;
         idx = idx + PointList.size();
@@ -177,33 +187,39 @@ public class Polygon {
         return idx;
     }
 
-
+    //sets a boolean if the edges of a polygon are connected and it is closed
     public void setPolygonDrawn() {
         this.isPolygonDrawn = true;
     }
 
+    //returns if the polygon is a closed polygon with connection edges as a circle
     public boolean getPolygonDrawn() {
         return this.isPolygonDrawn;
     }
 
+    //returns boolean whether q is set or not
     public boolean is_q_set() {
         return this.is_q_set;
     }
 
+    //returns the Pointlist which contains alle the points
     public ArrayList<Point> getPointList() {
         return PointList;
     }
 
+    //returns query points q
     public Point get_q() {
         return this.q;
     }
 
+    //moves query point q
     public void move_q(double x, double y) {
         if (q_in_Polygon(q)) {
             this.q.setCenterX(x);
             this.q.setCenterY(y);
         } else {
-            System.out.println("Out of Bounds, deleting p. \n Set a new p");
+            System.out.println("Out of Bounds, deleting p. \nSet a new p");
+            GUI.vis_q = null;
             q = null;
             this.is_q_set = false;
             GUI.pointscene.getChildren().remove(GUI.pointscene.getChildren().size() - 1);
@@ -212,6 +228,7 @@ public class Polygon {
         }
     }
 
+    //sets a new quiery point q and checks if it is in the polygon
     public void set_q(double x, double y) {
         this.q = createNode(x, y);
         this.q.setStroke(Color.DARKRED);
@@ -219,17 +236,11 @@ public class Polygon {
         if (q_in_Polygon(q)) {
             this.is_q_set = true;
             GUI.pointscene.getChildren().add(q);
-            System.out.println("q in polygon");
+            System.out.println("Query point q in polygon");
         } else {
-            System.out.println("q not in polygon, set another q");
+            System.out.println("Query point q not in polygon, set another q");
         }
 
-    }
-
-    public void colorBlack() {
-        for(int i = 0; i < PointList.size(); i++){
-            PointList.get(i).setFill(Color.BLACK);
-        }
     }
 
 }

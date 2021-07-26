@@ -1,8 +1,5 @@
 package geometry;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -18,7 +15,7 @@ public class Settings {
 
 
     private CheckBox vis_q_status = new CheckBox();
-    private Slider beta = new Slider(0, 720, 0);
+    private static Slider beta = new Slider(0, 720, 0);
 
     // ================================================================================================
     // gridpane
@@ -26,7 +23,7 @@ public class Settings {
     GridPane gp;
     int rowIndex = 0;
 
-    //propertiers
+    //properties
     private int toolbarWidth = 315;
 
 
@@ -62,8 +59,6 @@ public class Settings {
         column.setPercentWidth(70);
         gp.getColumnConstraints().add(column);
 
-        // add components for settings to gridpane
-
         // ----------------------------------------------------------------------------------------------------------
         // Points Options
         // ----------------------------------------------------------------------------------------------------------
@@ -73,7 +68,6 @@ public class Settings {
         Font font = Font.font("Arial", FontWeight.BOLD, 11);
         drawpoly.setFont(font);
         drawpoly.setMaxSize(60, 10);
-
 
         Button delnode = new Button("Delete");
         delnode.setFont(font);
@@ -93,15 +87,11 @@ public class Settings {
         addButton("Point Nodes", delnode);
 
 
-
         // ----------------------------------------------------------------------------------------------------------
         // Polygon Options
         // ----------------------------------------------------------------------------------------------------------
 
         addSeparator("Polygon Options");
-
-
-
 
         addCheckBox("VisibilityPolygon", vis_q_status);
         vis_q_status.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -114,7 +104,9 @@ public class Settings {
                     geometry.EventHandler.clicks = 0;
                     geometry.EventHandler.p_moving = false;
                     GUI.polygonscene.getChildren().clear();
-                    GUI.betavis_q_rec.deleteBetaVisPolygon();
+                    if(GUI.betavis_q_rec != null){
+                        GUI.betavis_q_rec.deleteBetaVisPolygon();
+                    }
                     beta.valueProperty().setValue(0);
                 }
             }
@@ -124,20 +116,15 @@ public class Settings {
         beta.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldvalue, Number newvalue) {
-                System.out.println("oldvalue:"+ oldvalue);
-                System.out.println("newvalue:"+ newvalue);
                 if(GUI.vis_q != null){
                     if (newvalue.intValue() == 0){
                         VisPolygon.betavis = false;
-                        System.out.println("newvalue = 0.0, deleted");
                         GUI.betavis_q_rec.deleteBetaVisPolygon();
                     } else if (oldvalue.intValue() == 0 && newvalue.intValue()!= 0){
                         VisPolygon.betavis = true;
-                        System.out.println("initial new polygon ");
                         GUI.betavis_q_rec = new Beta_Visibility_Brute(beta.getValue());
                     } else{
                         VisPolygon.betavis = true;
-                        System.out.println("deleted and created");
                         GUI.betavis_q_rec.deleteBetaVisPolygon();
                         GUI.betavis_q_rec = new Beta_Visibility_Brute(beta.getValue());
                     }
@@ -147,7 +134,6 @@ public class Settings {
             }
         });
 
-        //GUI.betavis_q.setBeta_global(beta.getValue());
 
         beta.setShowTickLabels(true);
         beta.setShowTickMarks(true);
@@ -155,8 +141,7 @@ public class Settings {
         beta.setMinorTickCount(45);
         addNumberSlider("Beta-Erweiterung", 0, beta);
 
-//        CheckBox realtime = new CheckBox();
-//        addCheckBox("Real Time Update", realtime);
+
 
         // ----------------------------------------------------------------------------------------------------------
         // Polygon Drawer
@@ -166,6 +151,7 @@ public class Settings {
 
         PolygonDrawer drawer = new PolygonDrawer();
 
+        //create Buttons for drawing an already set custom polygon in Class PolygonDrawer
 
         Button drawlaby_right = new Button("Draw");
         drawlaby_right.setFont(font);
@@ -351,16 +337,12 @@ public class Settings {
     private Node createSeparator(String text) {
 
         VBox box = new VBox();
-
         Label label = new Label(text);
-        label.setFont(Font.font(null, FontWeight.BOLD, 14));
-
         Separator separator = new Separator();
 
+        label.setFont(Font.font(null, FontWeight.BOLD, 14));
         box.getChildren().addAll(separator, label);
-
         box.setFillWidth(true);
-
         GridPane.setColumnSpan(box, 2);
         GridPane.setFillWidth(box, true);
         GridPane.setHgrow(box, Priority.ALWAYS);
@@ -373,11 +355,17 @@ public class Settings {
     // Getters and Setters
     // ------------------------------------------------------------------------------------------------
 
+    //gets the vis_q_status
     public CheckBox get_vis_q_Status() {
         return vis_q_status;
     }
 
+    //sets beta slider to zero
+    public static void setBetaZero(){
+        beta.valueProperty().setValue(0);
+    }
 
+    //returns settings width for Layout purpose
     public final int getSettingsWidth() {
         return this.toolbarWidth;
     }

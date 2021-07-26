@@ -10,7 +10,6 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent mouseEvent) {
 
-        System.out.println("GUI.polygon.addNode("+mouseEvent.getSceneX()+","+mouseEvent.getSceneY()+");");
 
         if (GUI.polygon.getPolygonDrawn() && !GUI.polygon.is_q_set() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315) {
             // Polygon drawn, draw Point from which visibility is to be calculated from
@@ -29,7 +28,6 @@ public class EventHandler implements javafx.event.EventHandler<MouseEvent> {
                 if (clicks >= 2){
                     p_moving = !p_moving;
                 }
-                System.out.println("p_moving");
             }
         }
 

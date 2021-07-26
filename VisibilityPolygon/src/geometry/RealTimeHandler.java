@@ -5,30 +5,28 @@ import javafx.scene.input.MouseEvent;
 public class RealTimeHandler implements javafx.event.EventHandler<MouseEvent> {
 
 
-
+    //function to real time click the point and drag it through the given polygon
     @Override
     public void handle(MouseEvent mouseEvent) {
-
 
         if (EventHandler.p_moving == true ){
             GUI.polygon.move_q(mouseEvent.getSceneX(), mouseEvent.getSceneY());
                 if( Settings.get().get_vis_q_Status().isSelected()){
-                    GUI.vis_q.deleteVisPolygon();
-//                    GUI.polygon.colorBlack();
-                    GUI.vis_q = new VisPolygon();
+                    if(GUI.vis_q != null){
+                        GUI.vis_q.deleteVisPolygon();
+                    }
+                    if(GUI.betavis_q_rec != null){
+                        GUI.betavis_q_rec.deleteBetaVisPolygon();
+                    }
+                    Settings.setBetaZero();
+                    try{
+                        GUI.vis_q = new VisPolygon();
+                    } catch (Exception e){
+                        System.out.println("Query Point q is out of bounds");
+                    }
+
                 }
         }
-//
-//        System.out.println("clicked");
-//        if(GUI.polygon.getPolygonDrawn() && GUI.polygon.is_p_set() && mouseEvent.getSceneX() <= GUI.primary.getWidth() - 315 ){
-//            if (GUI.polygon.inRange(GUI.polygon.createNode(mouseEvent.getSceneX(), mouseEvent.getSceneY()),GUI.polygon.get_p()) <15){
-//                GUI.polygon.move_p(mouseEvent.getSceneX(), mouseEvent.getSceneY());
-//                if( Settings.get().get_vis_p_Status().isSelected()){
-//                    GUI.vis_p.deleteVisPolygon();
-//                    GUI.vis_p = new VisPolygon();
-//                }
-//            }
-//        }
     }
 }
 
