@@ -665,7 +665,6 @@ public class Beta_Visibility_Brute extends VisPolygon {
 
         javafx.scene.shape.Polygon beta_vis_polygon = new javafx.scene.shape.Polygon();
 
-
         int stack_size = B_vis.size();
         for (int i = 0; i < stack_size; i++) {
             beta_vis_polygon.getPoints().addAll(B_vis.peek().getCenterX(), B_vis.pop().getCenterY());

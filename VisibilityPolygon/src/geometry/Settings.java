@@ -241,7 +241,7 @@ public class Settings {
                 drawer.draw_check_rec_area_tester();
             }
         });
-        addButton("Check Recursion Area tester", draw_checkrecursion_test);
+        addButton("Right-Left Winding", draw_checkrecursion_test);
 
         Button draw_custom_polygon = new Button("Draw");
         draw_custom_polygon.setFont(font);
@@ -251,7 +251,7 @@ public class Settings {
                 drawer.draw_custom_polygon();
             }
         });
-        addButton("Custom Polygon", draw_custom_polygon);
+        addButton("Zig Zag Polygon", draw_custom_polygon);
 
         Button draw_custom_polygon2 = new Button("Draw");
         draw_custom_polygon2.setFont(font);
@@ -261,7 +261,7 @@ public class Settings {
                 drawer.draw_custom_polygon2();
             }
         });
-        addButton("Custom Polygon Nr. 2", draw_custom_polygon2);
+        addButton("Anchor Polygon", draw_custom_polygon2);
 
         return gp;
     }
