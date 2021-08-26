@@ -1,10 +1,6 @@
 package geometry;
 
 import javafx.scene.paint.Color;
-
-import java.beans.Expression;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Collections;
 
