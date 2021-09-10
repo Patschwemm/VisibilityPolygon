@@ -277,8 +277,8 @@ public class VisPolygon extends Polygon {
             // if prior case of an intersection is found, so inner turn corner is not visible break out of loop
             if (linkedPoint != null
                     && linkedPoint.getPointLinked() != null
-                    && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
-            || visibleAngle(c,q,linkedPoint.getPointLinked()))){
+//                    && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
+            || (linkedPoint != null && visibleAngle(c,q,linkedPoint.getPointLinked()))){
 
             }
         }
@@ -287,8 +287,8 @@ public class VisPolygon extends Polygon {
         //check conditions for the intersection linked point that has been found in case of winding
         if (linkedPoint != null
                 && linkedPoint.getPointLinked() != null
-                && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
-                || visibleAngle(c,q,linkedPoint.getPointLinked()))){
+//                && (inRange(q, c) > inRange(q, linkedPoint.getPointLinked())
+                ||  (linkedPoint != null && visibleAngle(c,q,linkedPoint.getPointLinked()))){
             //call the function that deletes every point until the linked point of the intersection has been found again
             previousPointCovered(P, Vis, q, c, linkedPoint.getPointLinked());
 
